@@ -1,11 +1,12 @@
 "use client";
+import { ImageIcon, Video, Sparkles, Bot } from "lucide-react";
 import type { ContentType } from "@/lib/types";
 
-const OPTIONS: { value: ContentType; label: string; desc: string }[] = [
-  { value: "image",    label: "이미지 제작",    desc: "기존 사진·이미지 편집 및 합성" },
-  { value: "video",    label: "영상·모션 제작", desc: "컷 편집, 모션그래픽, 특수효과" },
-  { value: "ai-image", label: "AI 이미지 생성", desc: "Midjourney·Gemini로 이미지 생성" },
-  { value: "ai-video", label: "AI 영상 생성",   desc: "AI 영상 생성 및 후보정" },
+const OPTIONS: { value: ContentType; title: string; description: string; icon: React.ReactNode }[] = [
+  { value: "image",    title: "이미지 제작",    description: "기존 사진·이미지 편집 및 합성",    icon: <ImageIcon size={22} /> },
+  { value: "video",    title: "영상·모션 제작", description: "컷 편집, 모션그래픽, 특수효과",    icon: <Video size={22} /> },
+  { value: "ai-image", title: "AI 이미지 생성", description: "Midjourney·Gemini로 이미지 생성", icon: <Sparkles size={22} /> },
+  { value: "ai-video", title: "AI 영상 생성",   description: "AI 영상 생성 및 후보정",           icon: <Bot size={22} /> },
 ];
 
 interface Props {
@@ -17,47 +18,36 @@ interface Props {
 
 export default function Step3ContentType({ value, onChange, onNext, onBack }: Props) {
   const toggle = (t: ContentType) =>
-    onChange(value.includes(t) ? value.filter((x) => x !== t) : [...value, t]);
+    onChange(value.includes(t) ? value.filter(x => x !== t) : [...value, t]);
 
   return (
-    <div className="space-y-5">
-      <h2 className="text-xl font-bold text-gray-800">콘텐츠 유형</h2>
-      <p className="text-sm text-gray-500">필요한 작업을 모두 선택해주세요 (복수 선택 가능)</p>
-      <div className="space-y-3">
-        {OPTIONS.map((opt) => {
-          const selected = value.includes(opt.value);
-          return (
-            <button
-              key={opt.value}
-              onClick={() => toggle(opt.value)}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all
-                ${selected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center
-                  ${selected ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
-                  {selected && <span className="text-white text-xs font-bold">✓</span>}
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">{opt.label}</div>
-                  <div className="text-xs text-gray-500">{opt.desc}</div>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+    <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      <div className="p-8 border-b border-slate-50 bg-slate-50/30">
+        <h3 className="text-xl font-black text-slate-900 mb-1 tracking-tight">콘텐츠 유형</h3>
+        <p className="text-sm text-slate-400 font-medium">필요한 작업을 모두 선택해주세요 (복수 선택 가능)</p>
       </div>
-      <div className="flex gap-3">
-        <button onClick={onBack} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50">
-          ← 이전
-        </button>
-        <button
-          onClick={onNext}
-          disabled={value.length === 0}
-          className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40 hover:bg-blue-700"
-        >
-          다음 →
-        </button>
+      <div className="p-8">
+        <div className="divide-y divide-slate-50 border border-slate-100 rounded-2xl overflow-hidden">
+          {OPTIONS.map(opt => {
+            const selected = value.includes(opt.value);
+            return (
+              <label key={opt.value} className={`flex items-center p-5 transition-all hover:bg-slate-50 cursor-pointer ${selected ? "bg-blue-50/30" : ""}`}>
+                <input type="checkbox" className="w-5 h-5 rounded accent-primary" checked={selected} onChange={() => toggle(opt.value)} />
+                <div className="ml-5 flex items-center">
+                  <div className="p-2 bg-blue-50 rounded-xl text-primary mr-4">{opt.icon}</div>
+                  <div>
+                    <p className="font-bold text-slate-900 text-sm">{opt.title}</p>
+                    <p className="text-[12px] text-slate-400">{opt.description}</p>
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+      <div className="flex border-t border-slate-100 divide-x divide-slate-100">
+        <button onClick={onBack} className="flex-1 py-5 bg-slate-50 text-slate-500 font-bold text-sm hover:bg-slate-100 transition-all">← 이전</button>
+        <button onClick={onNext} disabled={value.length === 0} className="flex-1 py-5 bg-primary text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-40 transition-all">다음 →</button>
       </div>
     </div>
   );
