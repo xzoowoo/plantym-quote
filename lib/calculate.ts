@@ -117,9 +117,11 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     items.push(item("ai-video", RATES.ai.video, input.aiVideoDetails.count, false, 1));
   }
 
+  const filteredItems = items.filter(i => i.quantity > 0 && i.totalCost > 0);
+
   const costSubtotal = items.reduce((s, i) => s + i.totalCost, 0);
   const marginAmount = Math.round(costSubtotal * input.marginRate / 100);
   const totalPrice = costSubtotal + marginAmount;
 
-  return { lineItems: items, costSubtotal, marginAmount, totalPrice, categorySummary: buildSummary(items) };
+  return { lineItems: filteredItems, costSubtotal, marginAmount, totalPrice, categorySummary: buildSummary(filteredItems) };
 }

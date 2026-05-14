@@ -9,46 +9,48 @@ const CATEGORY_LABEL: Record<string, string> = {
   "ai-video": "AI 영상",
 };
 
+const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
+
 export default function QuoteTable({ result }: { result: QuoteResult }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
+      <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="bg-gray-100">
-            <th className="text-left px-3 py-2 border border-gray-200">구분</th>
-            <th className="text-left px-3 py-2 border border-gray-200">작업 항목</th>
-            <th className="text-center px-3 py-2 border border-gray-200">기준</th>
-            <th className="text-right px-3 py-2 border border-gray-200">수량</th>
-            <th className="text-right px-3 py-2 border border-gray-200">단가</th>
-            <th className="text-right px-3 py-2 border border-gray-200">합계</th>
+          <tr className="bg-slate-50 border-y border-slate-100">
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase">구분</th>
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase">작업 항목</th>
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase">기준</th>
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase text-center">수량</th>
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase text-right">단가</th>
+            <th className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase text-right">합계</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-50">
           {result.lineItems.map((item, i) => (
-            <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-              <td className="px-3 py-2 border border-gray-200 text-gray-500">{CATEGORY_LABEL[item.category]}</td>
-              <td className="px-3 py-2 border border-gray-200">{item.name}</td>
-              <td className="px-3 py-2 border border-gray-200 text-center text-gray-500">{item.unit}</td>
-              <td className="px-3 py-2 border border-gray-200 text-right">{item.quantity}</td>
-              <td className="px-3 py-2 border border-gray-200 text-right">{item.unitCost.toLocaleString()}원</td>
-              <td className="px-3 py-2 border border-gray-200 text-right font-medium">{item.totalCost.toLocaleString()}원</td>
+            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+              <td className="px-5 py-4 text-[12px] font-bold text-slate-400">{CATEGORY_LABEL[item.category]}</td>
+              <td className="px-5 py-4 text-[13px] font-bold text-slate-900">{item.name}</td>
+              <td className="px-5 py-4 text-[12px] text-slate-400">{item.unit}</td>
+              <td className="px-5 py-4 text-[13px] font-black text-slate-700 text-center font-mono">{item.quantity}</td>
+              <td className="px-5 py-4 text-[13px] text-slate-500 text-right font-mono">{fmt(item.unitCost)}</td>
+              <td className="px-5 py-4 text-[13px] font-black text-slate-900 text-right font-mono">{fmt(item.totalCost)}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
-          <tr className="bg-gray-100">
-            <td colSpan={5} className="px-3 py-2 border border-gray-200 text-right font-semibold">원가 소계</td>
-            <td className="px-3 py-2 border border-gray-200 text-right font-semibold">{result.costSubtotal.toLocaleString()}원</td>
+          <tr className="bg-slate-50/80">
+            <td colSpan={5} className="px-5 py-4 text-right text-slate-500 text-sm font-semibold">원가 소계</td>
+            <td className="px-5 py-4 text-right font-mono font-bold text-slate-900">{fmt(result.costSubtotal)}</td>
           </tr>
           {result.marginAmount > 0 && (
-            <tr className="bg-gray-100">
-              <td colSpan={5} className="px-3 py-2 border border-gray-200 text-right text-gray-600">마진</td>
-              <td className="px-3 py-2 border border-gray-200 text-right text-gray-600">+ {result.marginAmount.toLocaleString()}원</td>
+            <tr className="bg-blue-50/30">
+              <td colSpan={5} className="px-5 py-4 text-right text-primary text-sm font-semibold">마진</td>
+              <td className="px-5 py-4 text-right font-mono font-bold text-primary">+ {fmt(result.marginAmount)}</td>
             </tr>
           )}
-          <tr className="bg-blue-50">
-            <td colSpan={5} className="px-3 py-2 border border-blue-200 text-right font-bold text-blue-700 text-base">최종 견적가 (VAT 별도)</td>
-            <td className="px-3 py-2 border border-blue-200 text-right font-bold text-blue-700 text-base">{result.totalPrice.toLocaleString()}원</td>
+          <tr className="bg-primary/5">
+            <td colSpan={5} className="px-5 py-5 text-right text-slate-900 font-black text-base">최종 견적가 (VAT 별도)</td>
+            <td className="px-5 py-5 text-right font-mono font-black text-primary text-base">{fmt(result.totalPrice)}</td>
           </tr>
         </tfoot>
       </table>

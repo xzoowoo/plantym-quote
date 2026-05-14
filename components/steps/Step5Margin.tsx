@@ -1,4 +1,5 @@
 "use client";
+
 interface Props {
   marginRate: number;
   onChange: (v: number) => void;
@@ -7,62 +8,59 @@ interface Props {
   onBack: () => void;
 }
 
+const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
+
 export default function Step5Margin({ marginRate, onChange, previewSubtotal, onNext, onBack }: Props) {
   const marginAmount = Math.round(previewSubtotal * marginRate / 100);
   const total = previewSubtotal + marginAmount;
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-800">마진 설정</h2>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">마진율 (%)</label>
-        <div className="flex items-center gap-3">
-          <input
-            type="number"
-            min={0}
-            max={200}
-            value={marginRate}
-            onChange={(e) => onChange(Number(e.target.value))}
-            className="w-28 border border-gray-300 rounded-lg px-3 py-2 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <span className="text-gray-500">%</span>
-        </div>
-        <div className="flex gap-2 mt-2">
-          {[0, 10, 20, 30, 50].map((v) => (
-            <button
-              key={v}
-              onClick={() => onChange(v)}
-              className={`px-3 py-1 rounded text-sm border ${marginRate === v ? "bg-blue-600 text-white border-blue-600" : "border-gray-300 text-gray-600 hover:border-blue-400"}`}
-            >
-              {v}%
-            </button>
-          ))}
-        </div>
+    <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      <div className="p-8 border-b border-slate-50 bg-slate-50/30">
+        <h3 className="text-xl font-black text-slate-900 mb-1 tracking-tight">마진 설정</h3>
+        <p className="text-sm text-slate-400 font-medium">프로젝트의 마진율을 설정하여 최종 견적가를 산출합니다.</p>
       </div>
-      {previewSubtotal > 0 && (
-        <div className="p-4 bg-gray-50 rounded-xl border space-y-2 text-sm">
-          <div className="flex justify-between text-gray-600">
-            <span>원가 소계</span>
-            <span>{previewSubtotal.toLocaleString()}원</span>
+      <div className="p-8 space-y-8">
+        <div>
+          <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 block">마진율 (%)</label>
+          <div className="flex items-center space-x-6">
+            <input type="range" min={0} max={100} step={5} value={marginRate} onChange={e => onChange(Number(e.target.value))} className="flex-1 accent-primary" />
+            <div className="w-20 bg-blue-50 text-primary text-center py-2 rounded-xl font-black text-xl ring-2 ring-blue-100">{marginRate}%</div>
           </div>
-          <div className="flex justify-between text-gray-600">
-            <span>마진 ({marginRate}%)</span>
-            <span>+ {marginAmount.toLocaleString()}원</span>
+          <div className="flex space-x-2 mt-4">
+            {[0, 10, 20, 30, 50].map(m => (
+              <button key={m} onClick={() => onChange(m)}
+                className={`px-4 py-1.5 rounded-lg text-[12px] font-bold transition-all ${marginRate === m ? "bg-primary text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                {m}%
+              </button>
+            ))}
           </div>
-          <div className="flex justify-between font-bold text-lg text-blue-700 border-t pt-2">
-            <span>최종 견적가</span>
-            <span>{total.toLocaleString()}원</span>
-          </div>
-          <p className="text-xs text-gray-400">※ VAT 별도</p>
         </div>
-      )}
-      <div className="flex gap-3">
-        <button onClick={onBack} className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50">
-          ← 이전
-        </button>
-        <button onClick={onNext} className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700">
-          견적 확인 →
-        </button>
+
+        {previewSubtotal > 0 && (
+          <div className="bg-slate-900 rounded-2xl p-8 text-white space-y-4">
+            <div className="flex justify-between text-slate-400 text-sm">
+              <span>공급 원가 (Subtotal)</span>
+              <span className="font-mono">{fmt(previewSubtotal)}</span>
+            </div>
+            <div className="flex justify-between text-blue-400 text-sm font-bold">
+              <span>마진 ({marginRate}%)</span>
+              <span className="font-mono">+ {fmt(marginAmount)}</span>
+            </div>
+            <div className="h-px bg-slate-800" />
+            <div className="flex justify-between items-end">
+              <span className="text-lg font-bold">최종 제작가</span>
+              <div className="text-right">
+                <p className="text-3xl font-black font-mono leading-none">{fmt(total)}</p>
+                <p className="text-[11px] text-slate-500 mt-1">※ VAT 별도</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex border-t border-slate-100 divide-x divide-slate-100">
+        <button onClick={onBack} className="flex-1 py-5 bg-slate-50 text-slate-500 font-bold text-sm hover:bg-slate-100 transition-all">← 이전</button>
+        <button onClick={onNext} className="flex-1 py-5 bg-primary text-white font-bold text-sm hover:bg-blue-700 transition-all">견적 확인 →</button>
       </div>
     </div>
   );
