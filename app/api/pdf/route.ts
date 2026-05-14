@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const { input, result } = await req.json();
 
-    if (!input || !result) {
+    if (!input?.basicInfo || !result?.categorySummary || !Array.isArray(result.categorySummary)) {
       return NextResponse.json({ error: "유효하지 않은 요청입니다." }, { status: 400 });
     }
 
