@@ -1,65 +1,139 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import WizardNav from "@/components/WizardNav";
+import Step1BasicInfo from "@/components/steps/Step1BasicInfo";
+import Step2Panel from "@/components/steps/Step2Panel";
+import Step3ContentType from "@/components/steps/Step3ContentType";
+import Step4Details from "@/components/steps/Step4Details";
+import Step5Margin from "@/components/steps/Step5Margin";
+import Step6Result from "@/components/steps/Step6Result";
+import { calculateQuote } from "@/lib/calculate";
+import type { QuoteInput, QuoteResult } from "@/lib/types";
 
-export default function Home() {
+const INITIAL_INPUT: QuoteInput = {
+  basicInfo: { companyName: "", contactName: "", projectName: "", date: new Date().toISOString().slice(0, 10) },
+  panelInfo: { count: 1, size: "", isVideoWall: false },
+  contentTypes: [],
+  imageDetails: { hasSource: true, imageCount: 0, tasks: [] },
+  videoDetails: {
+    durationSeconds: 0, cutEdit: false, subtitle: false,
+    rolling: false, rollingCount: 0,
+    transition: "none", transitionCount: 0,
+    entrance: "none", entranceCount: 0,
+    emphasis: "none", emphasisCount: 0,
+    special: "none", specialCount: 0,
+    animation: "none", animationCount: 0,
+    renderQuality: "fhd", usbConvert: false,
+  },
+  aiImageDetails: { count: 0 },
+  aiVideoDetails: { count: 0 },
+  freeText: "",
+  marginRate: 0,
+};
+
+export default function Page() {
+  const [step, setStep] = useState(1);
+  const [input, setInput] = useState<QuoteInput>(INITIAL_INPUT);
+  const [result, setResult] = useState<QuoteResult | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const handleNext = () => {
+    if (step === 5) {
+      setResult(calculateQuote(input));
+    }
+    setStep((s) => s + 1);
+  };
+
+  const handleAIAnalyze = async () => {
+    if (!input.freeText.trim()) return;
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: input.freeText, contentTypes: input.contentTypes }),
+      });
+      const data = await res.json();
+      if (data.updates) {
+        setInput((prev) => ({ ...prev, ...data.updates }));
+      }
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const previewSubtotal = calculateQuote(input).costSubtotal;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen flex flex-col items-center py-10 px-4">
+      <div className="w-full max-w-2xl">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">영상 제작 견적 생성기</h1>
+          <p className="text-sm text-gray-500 mt-1">플랜티엠 콘텐츠 제작 단가 기준</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <WizardNav current={step} />
+        <div className="bg-white rounded-2xl shadow-sm border p-6">
+          {step === 1 && (
+            <Step1BasicInfo
+              value={input.basicInfo}
+              onChange={(v) => setInput({ ...input, basicInfo: v })}
+              onNext={handleNext}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          )}
+          {step === 2 && (
+            <Step2Panel
+              value={input.panelInfo}
+              onChange={(v) => setInput({ ...input, panelInfo: v })}
+              onNext={handleNext}
+              onBack={() => setStep(1)}
+            />
+          )}
+          {step === 3 && (
+            <Step3ContentType
+              value={input.contentTypes}
+              onChange={(v) => setInput({ ...input, contentTypes: v })}
+              onNext={handleNext}
+              onBack={() => setStep(2)}
+            />
+          )}
+          {step === 4 && (
+            <Step4Details
+              contentTypes={input.contentTypes}
+              imageDetails={input.imageDetails}
+              videoDetails={input.videoDetails}
+              aiImageDetails={input.aiImageDetails}
+              aiVideoDetails={input.aiVideoDetails}
+              freeText={input.freeText}
+              onChangeImage={(v) => setInput({ ...input, imageDetails: v })}
+              onChangeVideo={(v) => setInput({ ...input, videoDetails: v })}
+              onChangeAIImage={(v) => setInput({ ...input, aiImageDetails: v })}
+              onChangeAIVideo={(v) => setInput({ ...input, aiVideoDetails: v })}
+              onChangeFreeText={(v) => setInput({ ...input, freeText: v })}
+              onAIAnalyze={handleAIAnalyze}
+              aiLoading={aiLoading}
+              onNext={handleNext}
+              onBack={() => setStep(3)}
+            />
+          )}
+          {step === 5 && (
+            <Step5Margin
+              marginRate={input.marginRate}
+              onChange={(v) => setInput({ ...input, marginRate: v })}
+              previewSubtotal={previewSubtotal}
+              onNext={handleNext}
+              onBack={() => setStep(4)}
+            />
+          )}
+          {step === 6 && result && (
+            <Step6Result
+              input={input}
+              result={result}
+              onBack={() => setStep(5)}
+              onReset={() => { setStep(1); setInput(INITIAL_INPUT); setResult(null); }}
+            />
+          )}
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
