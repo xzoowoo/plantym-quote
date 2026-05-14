@@ -42,7 +42,12 @@ type은 image_task, video_task, motion 중 하나.`,
 
   const text_content = message.content[0].type === "text" ? message.content[0].text : "{}";
   const jsonMatch = text_content.match(/\{[\s\S]*\}/);
-  const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : { detected: [], summary: "" };
+  let parsed: { detected: unknown[]; summary: string } = { detected: [], summary: "" };
+  try {
+    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+  } catch {
+    // JSON 파싱 실패 시 빈 배열 fallback 유지
+  }
 
   return NextResponse.json({ detected: parsed.detected, summary: parsed.summary });
 }
