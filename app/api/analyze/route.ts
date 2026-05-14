@@ -10,15 +10,20 @@ const ITEM_LIST = `
 `;
 
 export async function POST(req: NextRequest) {
-  const { text, contentTypes } = await req.json();
+  try {
+    const { text, contentTypes } = await req.json();
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 512,
-    messages: [
-      {
-        role: "user",
-        content: `다음 작업 항목 목록을 참고해서, 사용자의 요청 텍스트에서 필요한 작업 항목과 수량을 추출해줘.
+    if (!text || typeof text !== "string" || text.length > 2000) {
+      return NextResponse.json({ error: "유효하지 않은 입력입니다." }, { status: 400 });
+    }
+
+    const message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 512,
+      messages: [
+        {
+          role: "user",
+          content: `다음 작업 항목 목록을 참고해서, 사용자의 요청 텍스트에서 필요한 작업 항목과 수량을 추출해줘.
 
 작업 항목 목록:
 ${ITEM_LIST}
@@ -36,18 +41,22 @@ ${ITEM_LIST}
 }
 
 type은 image_task, video_task, motion 중 하나.`,
-      },
-    ],
-  });
+        },
+      ],
+    });
 
-  const text_content = message.content[0].type === "text" ? message.content[0].text : "{}";
-  const jsonMatch = text_content.match(/\{[\s\S]*\}/);
-  let parsed: { detected: unknown[]; summary: string } = { detected: [], summary: "" };
-  try {
-    if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
-  } catch {
-    // JSON 파싱 실패 시 빈 배열 fallback 유지
+    const text_content = message.content[0].type === "text" ? message.content[0].text : "{}";
+    const jsonMatch = text_content.match(/\{[\s\S]*\}/);
+    let parsed: { detected: unknown[]; summary: string } = { detected: [], summary: "" };
+    try {
+      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    } catch {
+      // JSON 파싱 실패 시 빈 배열 fallback 유지
+    }
+
+    return NextResponse.json({ detected: parsed.detected, summary: parsed.summary });
+  } catch (e) {
+    console.error("analyze API error:", e);
+    return NextResponse.json({ error: "분석 중 오류가 발생했습니다." }, { status: 500 });
   }
-
-  return NextResponse.json({ detected: parsed.detected, summary: parsed.summary });
 }
