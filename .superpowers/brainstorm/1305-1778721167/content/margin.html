@@ -1,0 +1,30 @@
+<h2>업체 견적가, 원가 그대로 쓰나요?</h2>
+<p class="subtitle">단가표는 내부 원가 기준입니다. 업체에 보내는 금액을 어떻게 산정할지 결정해주세요.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>원가 그대로 사용</h3>
+      <p>단가표 계산값을 업체 견적가로 그대로 사용.<br>마진 조정 없음.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>마진율(%) 일괄 적용</h3>
+      <p>원가에 일정 비율(예: +30%)을 추가해서 견적가 산출.<br>견적 생성 시 마진율을 직접 입력.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>상황에 따라 직접 조정</h3>
+      <p>원가 계산 후, 최종 견적가를 직접 수정 가능.<br>업체·프로젝트마다 유연하게 대응.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px; padding:14px; background:#f3e5f5; border-radius:8px; font-size:13px; color:#6a1b9a;">
+  💡 내부에서는 원가 기준으로 확인하고, 업체 PDF에는 조정된 최종가만 보이도록 설계됩니다.
+</div>

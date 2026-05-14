@@ -1,0 +1,50 @@
+<h2>업체에 보여줄 견적서, 어느 수준으로?</h2>
+<p class="subtitle">단가표는 내부용이므로 외부 공개 범위를 결정해야 합니다</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f5f5f5; font-size:12px;">
+      <table style="width:100%; border-collapse:collapse; font-size:11px;">
+        <tr style="background:#e0e0e0;"><td style="padding:4px 8px;"><strong>항목</strong></td><td style="padding:4px 8px; text-align:right;"><strong>금액</strong></td></tr>
+        <tr><td style="padding:4px 8px;">이미지 편집 (5장)</td><td style="padding:4px 8px; text-align:right;">58,770원</td></tr>
+        <tr><td style="padding:4px 8px;">등장효과 (5건)</td><td style="padding:4px 8px; text-align:right;">19,590원</td></tr>
+        <tr><td style="padding:4px 8px;">강조효과 (3건)</td><td style="padding:4px 8px; text-align:right;">11,754원</td></tr>
+        <tr><td style="padding:4px 8px;">영상 렌더링</td><td style="padding:4px 8px; text-align:right;">3,920원</td></tr>
+        <tr style="background:#fff9c4; font-weight:bold;"><td style="padding:6px 8px;">합계</td><td style="padding:6px 8px; text-align:right;">94,034원</td></tr>
+      </table>
+    </div>
+    <div class="card-body">
+      <h3>A. 항목별 세부 내역 공개</h3>
+      <p>작업 종류와 각 항목 금액을 모두 보여줌.<br>투명하지만 단가 구조가 노출됨.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f5f5f5; font-size:12px;">
+      <table style="width:100%; border-collapse:collapse; font-size:11px;">
+        <tr style="background:#e0e0e0;"><td style="padding:4px 8px;"><strong>구분</strong></td><td style="padding:4px 8px; text-align:right;"><strong>금액</strong></td></tr>
+        <tr><td style="padding:4px 8px;">이미지 제작</td><td style="padding:4px 8px; text-align:right;">58,770원</td></tr>
+        <tr><td style="padding:4px 8px;">영상·모션 작업</td><td style="padding:4px 8px; text-align:right;">35,264원</td></tr>
+        <tr style="background:#fff9c4; font-weight:bold;"><td style="padding:6px 8px;">합계</td><td style="padding:6px 8px; text-align:right;">94,034원</td></tr>
+      </table>
+    </div>
+    <div class="card-body">
+      <h3>B. 카테고리별 요약만 공개</h3>
+      <p>이미지·영상·AI 등 큰 범주로만 묶어서 보여줌.<br>내부 단가 구조는 숨기면서 적당한 투명도 유지.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px; background:#f5f5f5; font-size:12px; text-align:center;">
+      <div style="font-size:28px; font-weight:bold; color:#333; margin: 16px 0;">94,034원</div>
+      <div style="font-size:11px; color:#888;">VAT 별도 · 패널 3개 기준</div>
+      <div style="margin-top:12px; background:#e3f2fd; border-radius:6px; padding:8px; font-size:11px; color:#1565c0;">
+        작업 범위: 이미지 제작 5장, 모션 포함, 15초 영상
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 총액 + 작업 요약만</h3>
+      <p>최종 금액과 어떤 작업인지 한 줄 요약만 보여줌.<br>단가 구조 완전 비공개, 가장 깔끔한 형태.</p>
+    </div>
+  </div>
+</div>

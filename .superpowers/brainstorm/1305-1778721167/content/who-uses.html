@@ -1,0 +1,30 @@
+<h2>견적 도구, 누가 사용하나요?</h2>
+<p class="subtitle">이 질문이 전체 설계 방향을 결정합니다</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>내가 직접 사용 (내부 도구)</h3>
+      <p>업체와 미팅하면서 내가 직접 입력하고 견적을 뽑아냄.<br>업체는 결과(견적서)만 받아봄.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>업체가 직접 입력 (외부 공개)</h3>
+      <p>업체에 링크를 보내면 업체가 직접 요구사항을 입력함.<br>입력 완료 후 견적이 자동으로 산출됨.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>둘 다 (상황에 따라)</h3>
+      <p>미팅 때는 내가 입력하고, 원격 업체에는 링크를 공유함.<br>두 방식 모두 지원.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #666;">
+  💡 <strong>참고:</strong> 현재 단가표는 내부용으로만 존재합니다. 어떤 방식을 선택하든 단가 정보는 외부에 노출되지 않도록 설계됩니다.
+</div>
