@@ -68,6 +68,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
 
   return (
     <div className="space-y-6">
+      {/* 기본 정보 */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: "업체명", value: input.basicInfo.companyName },
@@ -82,53 +83,57 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
         ))}
       </div>
 
-      <div className="flex gap-6">
-        <div className="flex-1 border border-slate-100 rounded-2xl overflow-x-auto">
-          <div className="min-w-[500px]">
-            <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-slate-50 border-b border-slate-100">
-              {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
-                <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
-              ))}
-            </div>
-            {grouped.map((group, i) => (
-              <div key={group.key} className={`grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
-                <div className="px-4 py-5 flex items-center space-x-2">
-                  <span className="text-lg shrink-0">{group.icon}</span>
-                  <span className="text-[13px] font-black text-slate-700">{group.label}</span>
-                </div>
-                <div className="px-4 py-5 text-[12px] font-bold text-slate-700">
-                  {group.itemNames.slice(0, 3).join(", ")}
-                  {group.itemNames.length > 3 && ` 외 ${group.itemNames.length - 3}건`}
-                </div>
-                <div className="px-4 py-5 text-[12px] text-slate-400">
-                  {group.description(group.itemNames)}
-                </div>
-                <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">
-                  {fmt(group.amount)}
-                </div>
-              </div>
+      {/* 견적 테이블 */}
+      <div className="border border-slate-100 rounded-2xl overflow-x-auto">
+        <div className="min-w-[500px]">
+          <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-slate-50 border-b border-slate-100">
+            {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
+              <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
             ))}
-            {result.marginAmount > 0 && (
-              <div className="grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 bg-white">
-                <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
-                <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
-                <div className="px-4 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
-                <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">{fmt(result.marginAmount)}</div>
+          </div>
+          {grouped.map((group, i) => (
+            <div key={group.key} className={`grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
+              <div className="px-4 py-5 flex items-center space-x-2">
+                <span className="text-lg shrink-0">{group.icon}</span>
+                <span className="text-[13px] font-black text-slate-700">{group.label}</span>
               </div>
-            )}
+              <div className="px-4 py-5 text-[12px] font-bold text-slate-700">
+                {group.itemNames.slice(0, 3).join(", ")}
+                {group.itemNames.length > 3 && ` 외 ${group.itemNames.length - 3}건`}
+              </div>
+              <div className="px-4 py-5 text-[12px] text-slate-400">
+                {group.description(group.itemNames)}
+              </div>
+              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">
+                {fmt(group.amount)}
+              </div>
+            </div>
+          ))}
+          {result.marginAmount > 0 && (
+            <div className="grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 bg-white">
+              <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
+              <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
+              <div className="px-4 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
+              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">{fmt(result.marginAmount)}</div>
+            </div>
+          )}
+          {/* 총 합계 — 테이블 맨 하단 */}
+          <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-primary/5 border-t-2 border-primary/20">
+            <div className="px-4 py-5 col-span-3 flex items-center justify-end pr-6 text-[13px] font-black text-slate-700">
+              총 견적 합계
+              <span className="text-[11px] font-medium text-slate-400 ml-2">* VAT 별도</span>
+            </div>
+            <div className="px-4 py-5 text-[15px] font-black text-primary font-mono">{fmt(result.totalPrice)}</div>
           </div>
         </div>
+      </div>
 
-        <div className="w-48 shrink-0 space-y-4">
-          <div className="bg-slate-900 rounded-2xl p-6 text-white">
-            <p className="text-[10px] text-slate-400 uppercase font-black mb-2">총 견적 합계</p>
-            <p className="text-2xl font-black font-mono leading-none">{fmt(result.totalPrice)}</p>
-            <p className="text-[10px] text-slate-500 mt-2">* VAT 별도</p>
-          </div>
-          <div className="bg-blue-50 rounded-2xl p-4 text-xs text-slate-500 leading-relaxed">
-            <p className="font-bold text-slate-700 mb-1">견적 산출 배경</p>
-            <p>플랜티엠 2026년도 콘텐츠 제작 표준 단가 기준 적용</p>
-          </div>
+      {/* 견적 산출 배경 */}
+      <div className="bg-blue-50 rounded-2xl px-5 py-4 flex items-center space-x-3">
+        <div className="w-1.5 h-8 bg-primary rounded-full shrink-0" />
+        <div>
+          <p className="text-[11px] font-black text-primary uppercase tracking-wider mb-0.5">견적 산출 배경</p>
+          <p className="text-[12px] text-slate-600">플랜티엠 2026년도 콘텐츠 제작 표준 단가 기준 적용</p>
         </div>
       </div>
     </div>
