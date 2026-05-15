@@ -94,6 +94,32 @@ export default function Page() {
         <WizardNav current={step} />
       </div>
 
+      {/* 다크 요약 바 (스텝 6) */}
+      {step === 6 && result && (
+        <div className="w-full max-w-[900px] mb-6">
+          <div className="bg-slate-900 rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
+            <div className="flex items-center space-x-6 divide-x divide-slate-800">
+              <div className="px-4 first:pl-0">
+                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">패널 규모</p>
+                <p className="text-sm font-bold">{input.panelInfo.count}대 / {input.panelInfo.size}</p>
+              </div>
+              <div className="px-4">
+                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">해상도 / 방향</p>
+                <p className="text-sm font-bold uppercase">{resolutionLabel[input.panelInfo.resolution] ?? input.panelInfo.resolution} / {input.panelInfo.orientation === "horizontal" ? "가로" : "세로"}</p>
+              </div>
+              <div className="px-4">
+                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">콘텐츠</p>
+                <p className="text-sm font-bold">{input.contentTypes.length}개 유형 선택됨</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] text-blue-400 uppercase font-black mb-1">최종 제작가 (VAT 별도)</p>
+              <p className="text-2xl font-black font-mono text-white">{fmt(result.totalPrice)}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 스텝 콘텐츠 */}
       <div className="w-full max-w-[900px] mb-12">
         {step === 1 && (
@@ -173,31 +199,6 @@ export default function Page() {
         </div>
       )}
 
-      {/* 다크 요약 바 (스텝 6) */}
-      {step === 6 && result && (
-        <div className="w-full max-w-[900px] mb-12">
-          <div className="bg-slate-900 rounded-2xl p-6 text-white flex justify-between items-center shadow-lg">
-            <div className="flex items-center space-x-6 divide-x divide-slate-800">
-              <div className="px-4 first:pl-0">
-                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">패널 규모</p>
-                <p className="text-sm font-bold">{input.panelInfo.count}대 / {input.panelInfo.size}</p>
-              </div>
-              <div className="px-4">
-                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">해상도 / 방향</p>
-                <p className="text-sm font-bold uppercase">{resolutionLabel[input.panelInfo.resolution] ?? input.panelInfo.resolution} / {input.panelInfo.orientation === "horizontal" ? "가로" : "세로"}</p>
-              </div>
-              <div className="px-4">
-                <p className="text-[10px] text-slate-500 uppercase font-black mb-1">콘텐츠</p>
-                <p className="text-sm font-bold">{input.contentTypes.length}개 유형 선택됨</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] text-blue-400 uppercase font-black mb-1">최종 제작가 (VAT 별도)</p>
-              <p className="text-2xl font-black font-mono text-white">{fmt(result.totalPrice)}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
