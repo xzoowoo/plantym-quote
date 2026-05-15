@@ -40,7 +40,8 @@ export function PDFDocument({ input, result }: { input: QuoteInput; result: Quot
             { label: "담당자", value: input.basicInfo.contactName },
             { label: "프로젝트", value: input.basicInfo.projectName },
             { label: "견적일", value: input.basicInfo.date ?? "" },
-            { label: "패널", value: `${input.panelInfo.count ?? 0}개 · ${input.panelInfo.size ?? ""}` },
+            { label: "패널 수", value: `${input.panelInfo.count ?? 0}개` },
+            { label: "사이즈", value: input.panelInfo.size ?? "" },
           ].map(({ label, value }) => (
             <View key={label} style={s.infoItem}>
               <Text style={s.infoLabel}>{label}</Text>
