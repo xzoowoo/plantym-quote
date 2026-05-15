@@ -126,6 +126,9 @@ export default function Step4Details({
               ))}
             </div>
             <CounterRow label="총 이미지 수 (장)" value={imageDetails.imageCount} onChange={n => onChangeImage({ ...imageDetails, imageCount: n })} />
+            {imageDetails.imageCount === 0 && imageDetails.tasks.length > 0 && (
+              <p className="text-[12px] text-amber-500 font-bold">⚠ 총 이미지 수를 1 이상 입력해야 편집 작업 항목이 견적에 반영됩니다.</p>
+            )}
             <div>
               <p className="text-[11px] font-black text-slate-400 uppercase mb-3">필요한 편집 작업 (복수 선택)</p>
               <div className="grid grid-cols-2 gap-2">

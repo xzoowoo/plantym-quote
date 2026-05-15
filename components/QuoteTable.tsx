@@ -1,3 +1,4 @@
+import React from "react";
 import type { QuoteResult, LineItem } from "@/lib/types";
 
 const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: string }> = {
@@ -12,14 +13,14 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
 export default function QuoteTable({ result }: { result: QuoteResult }) {
-  // 카테고리별로 항목 그룹화 (순서 유지)
+  // 카테고리별 그룹화 (순서 유지)
   const grouped: { category: LineItem["category"]; items: typeof result.lineItems }[] = [];
-  for (const item of result.lineItems) {
+  for (const lineItem of result.lineItems) {
     const last = grouped[grouped.length - 1];
-    if (last && last.category === item.category) {
-      last.items.push(item);
+    if (last && last.category === lineItem.category) {
+      last.items.push(lineItem);
     } else {
-      grouped.push({ category: item.category, items: [item] });
+      grouped.push({ category: lineItem.category, items: [lineItem] });
     }
   }
 
@@ -37,16 +38,16 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[80px]">기준</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[60px]">수량</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[110px]">단가</th>
-            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[120px]">합계</th>
+            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[120px] pr-6">합계</th>
           </tr>
         </thead>
         <tbody>
           {grouped.map(({ category, items }) => {
             const info = CATEGORY_INFO[category];
             return (
-              <>
-                {/* 카테고리 헤더 행 */}
-                <tr key={`cat-${category}`}>
+              <React.Fragment key={category}>
+                {/* 카테고리 그룹 헤더 */}
+                <tr>
                   <td colSpan={6} className="px-6 pt-7 pb-0">
                     <div className="text-[13px] font-semibold text-slate-600">
                       {info.label}
@@ -56,17 +57,17 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
                   </td>
                 </tr>
                 {/* 항목 행 */}
-                {items.map((item, i) => (
+                {items.map((lineItem, i) => (
                   <tr key={`${category}-${i}`} className="hover:bg-slate-50/40 transition-colors">
                     <td className="px-6 py-4" />
-                    <td className="px-4 py-4 text-[13px] font-medium text-slate-800">{item.name}</td>
-                    <td className="px-4 py-4 text-[12px] text-slate-400 text-center">{item.unit}</td>
-                    <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{item.quantity}</td>
-                    <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono">{fmt(item.unitCost)}</td>
-                    <td className="px-4 py-4 text-[13px] font-bold text-slate-900 text-right font-mono">{fmt(item.totalCost)}</td>
+                    <td className="px-4 py-4 text-[13px] font-medium text-slate-800">{lineItem.name}</td>
+                    <td className="px-4 py-4 text-[12px] text-slate-400 text-center">{lineItem.unit}</td>
+                    <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{lineItem.quantity}</td>
+                    <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono">{fmt(lineItem.unitCost)}</td>
+                    <td className="px-4 py-4 text-[13px] font-bold text-slate-900 text-right font-mono pr-6">{fmt(lineItem.totalCost)}</td>
                   </tr>
                 ))}
-              </>
+              </React.Fragment>
             );
           })}
         </tbody>

@@ -48,7 +48,7 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     if (!img.hasSource) {
       items.push(item("image", RATES.image.research, 1, true, p));
     }
-    if (img.tasks.includes("resize")) {
+    if (img.tasks.includes("resize") && n > 0) {
       const sets = Math.max(1, Math.ceil(n / 5));
       items.push(item("image", RATES.image.resize, sets, true, p));
     }
