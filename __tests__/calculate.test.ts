@@ -3,7 +3,7 @@ import type { QuoteInput } from "@/lib/types";
 
 const baseInput: QuoteInput = {
   basicInfo: { companyName: "테스트업체", contactName: "홍길동", projectName: "테스트", date: "2026-05-14" },
-  panelInfo: { count: 1, size: "55인치", isVideoWall: false },
+  panelInfo: { count: 1, size: "55인치", orientation: "horizontal", resolution: "fhd", isVideoWall: false },
   contentTypes: [],
   imageDetails: { hasSource: true, imageCount: 0, tasks: [] },
   videoDetails: {
@@ -68,7 +68,7 @@ describe("calculateQuote", () => {
   test("패널 2개 → 이미지 항목 비용 × 2", () => {
     const input: QuoteInput = {
       ...baseInput,
-      panelInfo: { count: 2, size: "55인치", isVideoWall: false },
+      panelInfo: { count: 2, size: "55인치", orientation: "horizontal", resolution: "fhd", isVideoWall: false },
       contentTypes: ["image"],
       imageDetails: { hasSource: true, imageCount: 1, tasks: ["remove-bg"] },
     };

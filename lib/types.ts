@@ -8,6 +8,8 @@ export interface BasicInfo {
 export interface PanelInfo {
   count: number;
   size: string;
+  orientation: "horizontal" | "vertical";
+  resolution: string;
   isVideoWall: boolean;
 }
 

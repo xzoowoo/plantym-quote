@@ -104,11 +104,11 @@ export default function Step4Details({
 
   return (
     <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-      <div className="p-8 border-b border-slate-50 bg-slate-50/30">
-        <h3 className="text-xl font-black text-slate-900 mb-1 tracking-tight">세부 요청사항</h3>
+      <div className="p-10 border-b border-slate-50 bg-slate-50/30">
+        <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">세부 요청사항</h3>
         <p className="text-sm text-slate-400 font-medium">선택한 유형별로 구체적인 작업 내용을 설정합니다.</p>
       </div>
-      <div className="p-8 space-y-8">
+      <div className="p-10 space-y-8">
 
         {/* 이미지 제작 */}
         {contentTypes.includes("image") && (
@@ -237,8 +237,8 @@ export default function Step4Details({
         </div>
       </div>
       <div className="flex border-t border-slate-100 divide-x divide-slate-100">
-        <button onClick={onBack} className="flex-1 py-5 bg-slate-50 text-slate-500 font-bold text-sm hover:bg-slate-100 transition-all">← 이전</button>
-        <button onClick={onNext} className="flex-1 py-5 bg-primary text-white font-bold text-sm hover:bg-blue-700 transition-all">다음 →</button>
+        <button onClick={onBack} className="flex-1 py-6 bg-slate-50 text-slate-500 font-bold text-sm tracking-tighter uppercase hover:bg-slate-100 transition-all">← 이전</button>
+        <button onClick={onNext} className="flex-1 py-6 bg-primary text-white font-bold text-sm tracking-tighter uppercase hover:bg-blue-700 transition-all">다음 →</button>
       </div>
     </div>
   );

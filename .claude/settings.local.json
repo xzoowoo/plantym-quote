@@ -1,7 +1,33 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bash *)"
+      "Bash(bash *)",
+      "PowerShell(ls \"C:\\\\Users\\\\zoowoo\\\\Documents\\\\Claude\\\\QuoteGenerator\" -Force | Where-Object { $_.Name -notlike \"node_modules\" } | Select-Object Name, LastWriteTime)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\zoowoo\\\\Documents\\\\Claude\\\\QuoteGenerator\" -Force | Where-Object { $_.Name -ne \"node_modules\" } | Select-Object -ExpandProperty Name)",
+      "Bash(Test-Path *)",
+      "PowerShell(git *)",
+      "Bash(npx jest *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/ts-jest/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/jest-util/package.json'\\).version\\)\")",
+      "Bash(npm install *)",
+      "Bash(ls node_modules/@jest/core/node_modules/)",
+      "Bash(ls node_modules/ts-jest/node_modules/)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@jest/core/node_modules/jest-util/package.json'\\).version\\)\")",
+      "Bash(node -e \"require\\('ts-jest'\\)\")",
+      "Bash(node -e \"require\\('./node_modules/ts-jest/dist/legacy/config/config-set.js'\\)\")",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(Select-String \"components\")",
+      "Bash(npx tsc *)",
+      "Bash(git commit *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('version:', d.get\\('version'\\)\\); print\\('types:', d.get\\('types', d.get\\('typings', 'none'\\)\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('types',''\\), d.get\\('exports',{}\\)\\)\")",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(python -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\('deps:', list\\(p.get\\('dependencies',{}\\).keys\\(\\)\\)\\)\")",
+      "WebFetch(domain:plantym-quote.vercel.app)"
     ]
   }
 }

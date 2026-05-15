@@ -22,11 +22,11 @@ export default function Step3ContentType({ value, onChange, onNext, onBack }: Pr
 
   return (
     <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-      <div className="p-8 border-b border-slate-50 bg-slate-50/30">
-        <h3 className="text-xl font-black text-slate-900 mb-1 tracking-tight">콘텐츠 유형</h3>
+      <div className="p-10 border-b border-slate-50 bg-slate-50/30">
+        <h3 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">콘텐츠 유형</h3>
         <p className="text-sm text-slate-400 font-medium">필요한 작업을 모두 선택해주세요 (복수 선택 가능)</p>
       </div>
-      <div className="p-8">
+      <div className="p-10">
         <div className="divide-y divide-slate-50 border border-slate-100 rounded-2xl overflow-hidden">
           {OPTIONS.map(opt => {
             const selected = value.includes(opt.value);
@@ -46,8 +46,8 @@ export default function Step3ContentType({ value, onChange, onNext, onBack }: Pr
         </div>
       </div>
       <div className="flex border-t border-slate-100 divide-x divide-slate-100">
-        <button onClick={onBack} className="flex-1 py-5 bg-slate-50 text-slate-500 font-bold text-sm hover:bg-slate-100 transition-all">← 이전</button>
-        <button onClick={onNext} disabled={value.length === 0} className="flex-1 py-5 bg-primary text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-40 transition-all">다음 →</button>
+        <button onClick={onBack} className="flex-1 py-6 bg-slate-50 text-slate-500 font-bold text-sm tracking-tighter uppercase hover:bg-slate-100 transition-all">← 이전</button>
+        <button onClick={onNext} disabled={value.length === 0} className="flex-1 py-6 bg-primary text-white font-bold text-sm tracking-tighter uppercase hover:bg-blue-700 disabled:opacity-40 transition-all">다음 →</button>
       </div>
     </div>
   );

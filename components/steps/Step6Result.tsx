@@ -166,28 +166,6 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
 
   return (
     <div className="w-full space-y-6">
-      {/* 상단 요약 바 */}
-      <div className="bg-slate-900 rounded-2xl p-5 text-white flex justify-between items-center">
-        <div className="flex items-center space-x-6 divide-x divide-slate-800">
-          <div className="px-4 first:pl-0">
-            <p className="text-[10px] text-slate-500 uppercase font-black mb-1">업체</p>
-            <p className="text-sm font-bold">{input.basicInfo.companyName}</p>
-          </div>
-          <div className="px-4">
-            <p className="text-[10px] text-slate-500 uppercase font-black mb-1">프로젝트</p>
-            <p className="text-sm font-bold">{input.basicInfo.projectName}</p>
-          </div>
-          <div className="px-4">
-            <p className="text-[10px] text-slate-500 uppercase font-black mb-1">패널</p>
-            <p className="text-sm font-bold">{input.panelInfo.count}개 · {input.panelInfo.size}</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] text-blue-400 uppercase font-black mb-1">최종 제작가 (VAT 별도)</p>
-          <p className="text-2xl font-black font-mono">{fmt(result.totalPrice)}</p>
-        </div>
-      </div>
-
       {/* 탭 + 액션 버튼 */}
       <div className="flex items-center justify-between">
         <div className="flex bg-slate-100 p-1 rounded-xl">
@@ -229,15 +207,16 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
         {tab === "internal" ? (
           <div>
-            <div className="p-6 border-b border-slate-50 bg-slate-50/30">
+            <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/30">
               <p className="text-[11px] font-black text-slate-400 uppercase">내부용 — 작업 항목별 원가 세부 내역 (외부 공개 금지)</p>
+              <p className="text-xs text-slate-500 mt-1">{input.basicInfo.companyName} · {input.basicInfo.projectName} · {input.basicInfo.date}</p>
             </div>
             <div className="p-4">
               <QuoteTable result={result} />
             </div>
           </div>
         ) : (
-          <div className="p-6">
+          <div className="p-8">
             <div className="mb-6 border-b border-slate-50 pb-4">
               <p className="text-[11px] font-black text-slate-400 uppercase">외부용 — 업체 제출용 견적서 (단가 비공개)</p>
             </div>
