@@ -88,38 +88,40 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
       {/* 견적 테이블 + 합계 사이드 */}
       <div className="flex gap-6">
         {/* 좌측: 작업 항목 테이블 */}
-        <div className="flex-1 border border-slate-100 rounded-2xl overflow-hidden">
-          <div className="grid grid-cols-[1fr_2fr_2fr_1fr] bg-slate-50 border-b border-slate-100">
-            {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
-              <div key={h} className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
+        <div className="flex-1 border border-slate-100 rounded-2xl overflow-x-auto">
+          <div className="min-w-[500px]">
+            <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-slate-50 border-b border-slate-100">
+              {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
+                <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
+              ))}
+            </div>
+            {grouped.map((group, i) => (
+              <div key={group.key} className={`grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
+                <div className="px-4 py-5 flex items-center space-x-2">
+                  <span className="text-lg shrink-0">{group.icon}</span>
+                  <span className="text-[13px] font-black text-slate-700">{group.label}</span>
+                </div>
+                <div className="px-4 py-5 text-[12px] font-bold text-slate-700">
+                  {group.itemNames.slice(0, 3).join(", ")}
+                  {group.itemNames.length > 3 && ` 외 ${group.itemNames.length - 3}건`}
+                </div>
+                <div className="px-4 py-5 text-[12px] text-slate-400">
+                  {group.description(group.itemNames)}
+                </div>
+                <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">
+                  {fmt(group.amount)}
+                </div>
+              </div>
             ))}
+            {result.marginAmount > 0 && (
+              <div className="grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 bg-white">
+                <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
+                <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
+                <div className="px-4 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
+                <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">{fmt(result.marginAmount)}</div>
+              </div>
+            )}
           </div>
-          {grouped.map((group, i) => (
-            <div key={group.key} className={`grid grid-cols-[1fr_2fr_2fr_1fr] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
-              <div className="px-5 py-5 flex items-center space-x-2">
-                <span className="text-lg">{group.icon}</span>
-                <span className="text-[13px] font-black text-slate-700">{group.label}</span>
-              </div>
-              <div className="px-5 py-5 text-[12px] font-bold text-slate-700">
-                {group.itemNames.slice(0, 3).join(", ")}
-                {group.itemNames.length > 3 && ` 외 ${group.itemNames.length - 3}건`}
-              </div>
-              <div className="px-5 py-5 text-[12px] text-slate-400">
-                {group.description(group.itemNames)}
-              </div>
-              <div className="px-5 py-5 text-[13px] font-black text-slate-900 font-mono">
-                {fmt(group.amount)}
-              </div>
-            </div>
-          ))}
-          {result.marginAmount > 0 && (
-            <div className="grid grid-cols-[1fr_2fr_2fr_1fr] border-b border-slate-50 bg-white">
-              <div className="px-5 py-5 text-[13px] font-black text-slate-500">···</div>
-              <div className="px-5 py-5 text-[12px] font-bold text-slate-700">기타</div>
-              <div className="px-5 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
-              <div className="px-5 py-5 text-[13px] font-black text-slate-900 font-mono">{fmt(result.marginAmount)}</div>
-            </div>
-          )}
         </div>
 
         {/* 우측: 총 합계 박스 */}
@@ -149,12 +151,13 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
       const res = await fetch("/api/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, result }),
+        body: JSON.stringify({ input, result, type: tab }),
       });
       const { base64 } = await res.json();
+      const prefix = tab === "internal" ? "내부견적서" : "외부견적서";
       const link = document.createElement("a");
       link.href = `data:application/pdf;base64,${base64}`;
-      link.download = `견적서_${input.basicInfo.companyName}_${input.basicInfo.date}.pdf`;
+      link.download = `${prefix}_${input.basicInfo.companyName}_${input.basicInfo.date}.pdf`;
       link.click();
     } finally {
       setDownloading(false);

@@ -1,9 +1,14 @@
-// components/PDFDocument.tsx
-import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+import path from "path";
 import type { QuoteInput, QuoteResult } from "@/lib/types";
 
+Font.register({
+  family: "NotoSansKR",
+  src: path.join(process.cwd(), "public", "fonts", "NotoSansKR.ttf"),
+});
+
 const s = StyleSheet.create({
-  page: { padding: 48, fontFamily: "Helvetica", fontSize: 10, color: "#333" },
+  page: { padding: 48, fontFamily: "NotoSansKR", fontSize: 10, color: "#333" },
   title: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
   subtitle: { fontSize: 11, color: "#666", marginBottom: 24 },
   section: { marginBottom: 16 },
@@ -11,10 +16,10 @@ const s = StyleSheet.create({
   row: { flexDirection: "row", borderBottom: "1pt solid #e5e7eb", paddingVertical: 5 },
   headerRow: { flexDirection: "row", backgroundColor: "#f3f4f6", paddingVertical: 6, marginBottom: 2 },
   col1: { flex: 3 },
-  col2: { flex: 1, textAlign: "right" },
+  col2: { width: 90, textAlign: "right" },
   totalRow: { flexDirection: "row", paddingVertical: 8, borderTop: "2pt solid #1a56db", marginTop: 4 },
   totalLabel: { flex: 3, fontSize: 12, fontWeight: "bold", color: "#1a56db" },
-  totalValue: { flex: 1, fontSize: 12, fontWeight: "bold", color: "#1a56db", textAlign: "right" },
+  totalValue: { width: 90, fontSize: 12, fontWeight: "bold", color: "#1a56db", textAlign: "right" },
   note: { fontSize: 8, color: "#9ca3af", marginTop: 24 },
   infoGrid: { flexDirection: "row", gap: 16, marginBottom: 24 },
   infoItem: { flex: 1 },
@@ -58,7 +63,7 @@ export function PDFDocument({ input, result }: { input: QuoteInput; result: Quot
           ))}
           {result.marginAmount > 0 && (
             <View style={s.row}>
-              <Text style={s.col1}>기타</Text>
+              <Text style={s.col1}>기타 (프로젝트 관리 및 제경비)</Text>
               <Text style={s.col2}>{result.marginAmount.toLocaleString()}원</Text>
             </View>
           )}

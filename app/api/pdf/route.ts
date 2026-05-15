@@ -1,18 +1,19 @@
-// app/api/pdf/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { renderToBuffer, DocumentProps } from "@react-pdf/renderer";
 import { PDFDocument } from "@/components/PDFDocument";
+import { PDFDocumentInternal } from "@/components/PDFDocumentInternal";
 import React from "react";
 
 export async function POST(req: NextRequest) {
   try {
-    const { input, result } = await req.json();
+    const { input, result, type } = await req.json();
 
     if (!input?.basicInfo || !result?.categorySummary || !Array.isArray(result.categorySummary)) {
       return NextResponse.json({ error: "유효하지 않은 요청입니다." }, { status: 400 });
     }
 
-    const element = React.createElement(PDFDocument, { input, result }) as React.ReactElement<DocumentProps>;
+    const Component = type === "internal" ? PDFDocumentInternal : PDFDocument;
+    const element = React.createElement(Component, { input, result }) as React.ReactElement<DocumentProps>;
     const buffer = await renderToBuffer(element);
     const base64 = Buffer.from(buffer).toString("base64");
     return NextResponse.json({ base64 });

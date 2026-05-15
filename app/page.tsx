@@ -66,7 +66,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen flex flex-col items-center py-10 px-4">
-      <div className="w-full max-w-2xl">
+      <div className={`w-full ${step === 6 ? "max-w-5xl" : "max-w-2xl"}`}>
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">영상 제작 견적 생성기</h1>
           <p className="text-sm text-gray-500 mt-1">플랜티엠 콘텐츠 제작 단가 기준</p>
