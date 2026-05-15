@@ -76,7 +76,7 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
           {result.marginAmount > 0 && (
             <tr>
               <td colSpan={4} className="px-6 py-3 text-right text-[13px] text-primary font-medium">마진 ({marginRate}%)</td>
-              <td className="px-4 py-3 text-right font-mono font-bold text-primary text-[14px] pr-6">+ {fmt(result.marginAmount)}</td>
+              <td className="px-4 py-3 text-right font-mono font-bold text-primary text-[14px] pr-6 whitespace-nowrap">+ {fmt(result.marginAmount)}</td>
             </tr>
           )}
           <tr className="bg-primary/5">
