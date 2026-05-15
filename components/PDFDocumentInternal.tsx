@@ -1,20 +1,22 @@
 import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
 import path from "path";
-import type { QuoteInput, QuoteResult } from "@/lib/types";
+import type { QuoteInput, QuoteResult, LineItem } from "@/lib/types";
 
 Font.register({
   family: "NotoSansKR",
   src: path.join(process.cwd(), "public", "fonts", "NotoSansKR.ttf"),
 });
 
-const CATEGORY_LABEL: Record<string, string> = {
-  image: "이미지",
-  video: "영상",
-  motion: "모션",
-  render: "렌더·인코딩",
-  "ai-image": "AI 이미지",
-  "ai-video": "AI 영상",
+const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: string }> = {
+  image:      { label: "이미지 제작",  english: "Image Production" },
+  video:      { label: "영상 제작",    english: "Video Production" },
+  motion:     { label: "모션그래픽",   english: "Motion Graphic" },
+  render:     { label: "렌더.인코딩", english: "Rendering" },
+  "ai-image": { label: "AI 이미지",   english: "AI Image" },
+  "ai-video": { label: "AI 영상",     english: "AI Video" },
 };
+
+const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
 const s = StyleSheet.create({
   page: { padding: 48, fontFamily: "NotoSansKR", fontSize: 10, color: "#333" },
@@ -30,40 +32,67 @@ const s = StyleSheet.create({
   infoLabel: { fontSize: 8, color: "#9ca3af", marginBottom: 2 },
   infoValue: { fontSize: 10, fontWeight: "bold" },
   sectionTitle: { fontSize: 12, fontWeight: "bold", marginBottom: 8, color: "#1a56db" },
+  // 테이블 헤더
   headerRow: {
-    flexDirection: "row", backgroundColor: "#f3f4f6",
-    paddingVertical: 6, paddingHorizontal: 4,
+    flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#e5e7eb",
+    paddingVertical: 7, paddingHorizontal: 6,
   },
+  hName:     { flex: 1,    fontSize: 8, color: "#9ca3af" },
+  hUnit:     { width: 50,  fontSize: 8, color: "#9ca3af", textAlign: "center" },
+  hQty:      { width: 35,  fontSize: 8, color: "#9ca3af", textAlign: "center" },
+  hUnitCost: { width: 72,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
+  hTotal:    { width: 72,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
+  // 카테고리 그룹 헤더
+  catRow: { paddingTop: 14, paddingHorizontal: 6, paddingBottom: 0 },
+  catLabel: { fontSize: 10, fontWeight: "bold", color: "#4b5563" },
+  catEnglish: { fontSize: 9, color: "#9ca3af" },
+  catLine: { borderBottomWidth: 1, borderBottomColor: "#d1d5db", marginTop: 5 },
+  // 항목 행
   row: {
-    flexDirection: "row", borderBottom: "1pt solid #f0f0f0",
-    paddingVertical: 5, paddingHorizontal: 4,
+    flexDirection: "row",
+    paddingVertical: 6, paddingHorizontal: 6, paddingLeft: 14,
+    borderBottomWidth: 1, borderBottomColor: "#f9fafb",
   },
-  rowAlt: {
-    flexDirection: "row", borderBottom: "1pt solid #f0f0f0",
-    paddingVertical: 5, paddingHorizontal: 4, backgroundColor: "#fafafa",
-  },
-  cCategory: { width: 60, fontSize: 9, color: "#6b7280" },
-  cName: { flex: 1, fontSize: 9 },
-  cUnit: { width: 75, fontSize: 9, color: "#6b7280" },
-  cQty: { width: 45, fontSize: 9, textAlign: "center" },
-  cUnitCost: { width: 70, fontSize: 9, textAlign: "right", color: "#6b7280" },
-  cTotal: { width: 70, fontSize: 9, textAlign: "right", fontWeight: "bold" },
+  cName:     { flex: 1,   fontSize: 9, color: "#1f2937" },
+  cUnit:     { width: 50, fontSize: 9, color: "#9ca3af", textAlign: "center" },
+  cQty:      { width: 35, fontSize: 9, color: "#1f2937", fontWeight: "bold", textAlign: "center" },
+  cUnitCost: { width: 72, fontSize: 9, color: "#9ca3af", textAlign: "right" },
+  cTotal:    { width: 72, fontSize: 9, color: "#111827", fontWeight: "bold", textAlign: "right" },
+  // 푸터
   footerRow: {
-    flexDirection: "row", paddingVertical: 6, paddingHorizontal: 4,
-    borderTop: "1pt solid #e5e7eb",
+    flexDirection: "row", paddingVertical: 6, paddingHorizontal: 6,
+    borderTopWidth: 1, borderTopColor: "#e5e7eb",
   },
   footerLabel: { flex: 1, textAlign: "right", fontSize: 10, color: "#6b7280", paddingRight: 8 },
-  footerValue: { width: 70, textAlign: "right", fontSize: 10 },
+  footerValue: { width: 72, textAlign: "right", fontSize: 10, color: "#111827", fontWeight: "bold" },
+  marginRow: { flexDirection: "row", paddingVertical: 5, paddingHorizontal: 6 },
+  marginLabel: { flex: 1, textAlign: "right", fontSize: 10, color: "#1a56db", paddingRight: 8 },
+  marginValue: { width: 72, textAlign: "right", fontSize: 10, color: "#1a56db", fontWeight: "bold" },
   totalRow: {
-    flexDirection: "row", paddingVertical: 8, paddingHorizontal: 4,
-    borderTop: "2pt solid #1a56db", marginTop: 2,
+    flexDirection: "row", paddingVertical: 8, paddingHorizontal: 6,
+    borderTopWidth: 2, borderTopColor: "#1a56db", marginTop: 2,
   },
   totalLabel: { flex: 1, textAlign: "right", fontSize: 11, fontWeight: "bold", color: "#1a56db", paddingRight: 8 },
-  totalValue: { width: 70, textAlign: "right", fontSize: 11, fontWeight: "bold", color: "#1a56db" },
+  totalValue: { width: 72, textAlign: "right", fontSize: 11, fontWeight: "bold", color: "#1a56db" },
   note: { fontSize: 8, color: "#9ca3af", marginTop: 24 },
 });
 
 export function PDFDocumentInternal({ input, result }: { input: QuoteInput; result: QuoteResult }) {
+  // 카테고리별 그룹화
+  const grouped: { category: LineItem["category"]; items: typeof result.lineItems }[] = [];
+  for (const lineItem of result.lineItems) {
+    const last = grouped[grouped.length - 1];
+    if (last && last.category === lineItem.category) {
+      last.items.push(lineItem);
+    } else {
+      grouped.push({ category: lineItem.category, items: [lineItem] });
+    }
+  }
+
+  const marginRate = result.costSubtotal > 0
+    ? Math.round(result.marginAmount / result.costSubtotal * 100)
+    : 0;
+
   return (
     <Document>
       <Page size="A4" style={s.page}>
@@ -73,12 +102,12 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
 
         <View style={s.infoGrid}>
           {[
-            { label: "업체명", value: input.basicInfo.companyName },
-            { label: "담당자", value: input.basicInfo.contactName },
+            { label: "업체명",    value: input.basicInfo.companyName },
+            { label: "담당자",    value: input.basicInfo.contactName },
             { label: "프로젝트", value: input.basicInfo.projectName },
-            { label: "견적일", value: input.basicInfo.date ?? "" },
-            { label: "패널 수", value: `${input.panelInfo.count ?? 0}개` },
-            { label: "패널 사이즈", value: input.panelInfo.size ?? "" },
+            { label: "견적일",   value: input.basicInfo.date ?? "" },
+            { label: "패널 수",  value: `${input.panelInfo.count ?? 0}개` },
+            { label: "사이즈",   value: input.panelInfo.size ?? "" },
           ].map(({ label, value }) => (
             <View key={label} style={s.infoItem}>
               <Text style={s.infoLabel}>{label}</Text>
@@ -89,44 +118,59 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
 
         <Text style={s.sectionTitle}>작업 항목 원가 내역</Text>
 
+        {/* 테이블 헤더 */}
         <View style={s.headerRow}>
-          <Text style={s.cCategory}>구분</Text>
-          <Text style={s.cName}>작업 항목</Text>
-          <Text style={s.cUnit}>기준</Text>
-          <Text style={s.cQty}>수량</Text>
-          <Text style={s.cUnitCost}>단가</Text>
-          <Text style={s.cTotal}>합계</Text>
+          <Text style={s.hName}>작업 항목</Text>
+          <Text style={s.hUnit}>기준</Text>
+          <Text style={s.hQty}>수량</Text>
+          <Text style={s.hUnitCost}>단가</Text>
+          <Text style={s.hTotal}>합계</Text>
         </View>
 
-        {result.lineItems.map((item, i) => (
-          <View key={i} style={i % 2 === 0 ? s.row : s.rowAlt}>
-            <Text style={s.cCategory}>{CATEGORY_LABEL[item.category] ?? item.category}</Text>
-            <Text style={s.cName}>{item.name}</Text>
-            <Text style={s.cUnit}>{item.unit}</Text>
-            <Text style={s.cQty}>{item.quantity}</Text>
-            <Text style={s.cUnitCost}>{item.unitCost.toLocaleString()}원</Text>
-            <Text style={s.cTotal}>{item.totalCost.toLocaleString()}원</Text>
-          </View>
-        ))}
+        {/* 카테고리 그룹별 항목 */}
+        {grouped.map(({ category, items }) => {
+          const info = CATEGORY_INFO[category];
+          return (
+            <View key={category}>
+              {/* 카테고리 헤더 */}
+              <View style={s.catRow}>
+                <Text style={s.catLabel}>
+                  {info.label}{"  "}
+                  <Text style={s.catEnglish}>({info.english})</Text>
+                </Text>
+                <View style={s.catLine} />
+              </View>
+              {/* 항목 */}
+              {items.map((lineItem, i) => (
+                <View key={i} style={s.row}>
+                  <Text style={s.cName}>{lineItem.name}</Text>
+                  <Text style={s.cUnit}>{lineItem.unit}</Text>
+                  <Text style={s.cQty}>{lineItem.quantity}</Text>
+                  <Text style={s.cUnitCost}>{fmt(lineItem.unitCost)}</Text>
+                  <Text style={s.cTotal}>{fmt(lineItem.totalCost)}</Text>
+                </View>
+              ))}
+            </View>
+          );
+        })}
 
+        {/* 푸터 합계 */}
         <View style={s.footerRow}>
           <Text style={s.footerLabel}>원가 소계</Text>
-          <Text style={s.footerValue}>{result.costSubtotal.toLocaleString()}원</Text>
+          <Text style={s.footerValue}>{fmt(result.costSubtotal)}</Text>
         </View>
         {result.marginAmount > 0 && (
-          <View style={s.footerRow}>
-            <Text style={[s.footerLabel, { color: "#1a56db" }]}>마진</Text>
-            <Text style={[s.footerValue, { color: "#1a56db" }]}>+ {result.marginAmount.toLocaleString()}원</Text>
+          <View style={s.marginRow}>
+            <Text style={s.marginLabel}>마진 ({marginRate}%)</Text>
+            <Text style={s.marginValue}>+ {fmt(result.marginAmount)}</Text>
           </View>
         )}
         <View style={s.totalRow}>
           <Text style={s.totalLabel}>최종 견적가 (VAT 별도)</Text>
-          <Text style={s.totalValue}>{result.totalPrice.toLocaleString()}원</Text>
+          <Text style={s.totalValue}>{fmt(result.totalPrice)}</Text>
         </View>
 
-        <Text style={s.note}>
-          본 문서는 내부 원가 정보를 포함하고 있어 외부 공개를 금합니다. 플랜티엠
-        </Text>
+        <Text style={s.note}>본 문서는 내부 원가 정보를 포함하고 있어 외부 공개를 금합니다. 플랜티엠</Text>
       </Page>
     </Document>
   );
