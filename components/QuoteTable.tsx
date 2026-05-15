@@ -13,7 +13,6 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
 export default function QuoteTable({ result }: { result: QuoteResult }) {
-  // 카테고리별 그룹화 (순서 유지)
   const grouped: { category: LineItem["category"]; items: typeof result.lineItems }[] = [];
   for (const lineItem of result.lineItems) {
     const last = grouped[grouped.length - 1];
@@ -33,8 +32,7 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-slate-100">
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 w-[110px]">구분</th>
-            <th className="px-4 py-4 text-[11px] font-bold text-slate-400">작업 항목</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400">작업 항목</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[80px]">기준</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[60px]">수량</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[110px]">단가</th>
@@ -48,19 +46,18 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
               <React.Fragment key={category}>
                 {/* 카테고리 그룹 헤더 */}
                 <tr>
-                  <td colSpan={6} className="px-6 pt-7 pb-0">
+                  <td colSpan={5} className="px-6 pt-7 pb-0">
                     <div className="text-[13px] font-semibold text-slate-600">
                       {info.label}
                       <span className="text-slate-400 font-normal ml-1.5">({info.english})</span>
                     </div>
-                    <div className="mt-2.5 border-b border-slate-200" />
+                    <div className="mt-2 border-b border-slate-200" />
                   </td>
                 </tr>
                 {/* 항목 행 */}
                 {items.map((lineItem, i) => (
                   <tr key={`${category}-${i}`} className="hover:bg-slate-50/40 transition-colors">
-                    <td className="px-6 py-4" />
-                    <td className="px-4 py-4 text-[13px] font-medium text-slate-800">{lineItem.name}</td>
+                    <td className="px-6 py-4 pl-8 text-[13px] font-medium text-slate-800">{lineItem.name}</td>
                     <td className="px-4 py-4 text-[12px] text-slate-400 text-center">{lineItem.unit}</td>
                     <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{lineItem.quantity}</td>
                     <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono">{fmt(lineItem.unitCost)}</td>
@@ -73,17 +70,17 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
         </tbody>
         <tfoot>
           <tr className="border-t border-slate-100">
-            <td colSpan={5} className="px-6 py-5 text-right text-[13px] text-slate-500 font-medium">원가 소계</td>
+            <td colSpan={4} className="px-6 py-5 text-right text-[13px] text-slate-500 font-medium">원가 소계</td>
             <td className="px-4 py-5 text-right font-mono font-black text-slate-900 text-[15px] pr-6">{fmt(result.costSubtotal)}</td>
           </tr>
           {result.marginAmount > 0 && (
             <tr>
-              <td colSpan={5} className="px-6 py-3 text-right text-[13px] text-primary font-medium">마진 ({marginRate}%)</td>
+              <td colSpan={4} className="px-6 py-3 text-right text-[13px] text-primary font-medium">마진 ({marginRate}%)</td>
               <td className="px-4 py-3 text-right font-mono font-bold text-primary text-[14px] pr-6">+ {fmt(result.marginAmount)}</td>
             </tr>
           )}
           <tr className="bg-primary/5">
-            <td colSpan={5} className="px-6 py-5 text-right font-black text-slate-900 text-[14px]">최종 견적가 (VAT 별도)</td>
+            <td colSpan={4} className="px-6 py-5 text-right font-black text-slate-900 text-[14px]">최종 견적가 (VAT 별도)</td>
             <td className="px-4 py-5 text-right font-mono font-black text-primary text-[15px] pr-6">{fmt(result.totalPrice)}</td>
           </tr>
         </tfoot>
