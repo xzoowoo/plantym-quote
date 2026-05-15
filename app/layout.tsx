@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
@@ -12,10 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className="min-h-screen">
-        <div className="min-h-screen flex bg-slate-50">
-          <Sidebar />
-          <main className="pl-[260px] flex-1 flex flex-col">
-            <Header />
+        <div className="min-h-screen flex flex-col bg-slate-50">
+          <Header />
+          <main className="flex-1 flex flex-col">
             {children}
           </main>
         </div>

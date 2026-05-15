@@ -13,7 +13,6 @@ interface Props {
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
-// 외부용 카테고리 정의 (슬라이드4 형식)
 const EXTERNAL_GROUPS = [
   {
     key: "image",
@@ -60,7 +59,6 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
       ))
       .reduce((s, c) => s + c.amount, 0);
 
-    // 해당 카테고리 아이템 이름 목록
     const itemNames = result.lineItems
       .filter(i => (group.categories as readonly string[]).includes(i.category))
       .map(i => i.name);
@@ -70,7 +68,6 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
 
   return (
     <div className="space-y-6">
-      {/* 헤더 정보 */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: "업체명", value: input.basicInfo.companyName },
@@ -85,9 +82,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
         ))}
       </div>
 
-      {/* 견적 테이블 + 합계 사이드 */}
       <div className="flex gap-6">
-        {/* 좌측: 작업 항목 테이블 */}
         <div className="flex-1 border border-slate-100 rounded-2xl overflow-x-auto">
           <div className="min-w-[500px]">
             <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-slate-50 border-b border-slate-100">
@@ -124,7 +119,6 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
           </div>
         </div>
 
-        {/* 우측: 총 합계 박스 */}
         <div className="w-48 shrink-0 space-y-4">
           <div className="bg-slate-900 rounded-2xl p-6 text-white">
             <p className="text-[10px] text-slate-400 uppercase font-black mb-2">총 견적 합계</p>
@@ -165,69 +159,70 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
   };
 
   return (
-    <div className="w-full space-y-6">
-      {/* 탭 + 액션 버튼 */}
-      <div className="flex items-center justify-between">
-        <div className="flex bg-slate-100 p-1 rounded-xl">
-          <button
-            onClick={() => setTab("internal")}
-            className={`flex items-center space-x-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${tab === "internal" ? "bg-white text-primary shadow-sm" : "text-slate-500"}`}
-          >
-            <Table size={16} />
-            <span>내부용 세부 내역</span>
-          </button>
-          <button
-            onClick={() => setTab("external")}
-            className={`flex items-center space-x-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${tab === "external" ? "bg-white text-primary shadow-sm" : "text-slate-500"}`}
-          >
-            <FileText size={16} />
-            <span>외부용 견적서</span>
-          </button>
+    <div className="w-full space-y-5">
+      {/* 메인 카드 */}
+      <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        {/* 카드 헤더: 제목 + 탭 */}
+        <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-black text-slate-900">
+              견적 결과 ({tab === "internal" ? "내부용" : "외부용"})
+            </h3>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {input.basicInfo.companyName} · {input.basicInfo.projectName} · {input.basicInfo.date}
+            </p>
+          </div>
+          <div className="flex bg-slate-100 p-1 rounded-xl">
+            <button
+              onClick={() => setTab("internal")}
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === "internal" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              <Table size={13} />
+              <span>내부용</span>
+            </button>
+            <button
+              onClick={() => setTab("external")}
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${tab === "external" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              <FileText size={13} />
+              <span>외부용</span>
+            </button>
+          </div>
         </div>
+
+        {/* 카드 콘텐츠 */}
+        {tab === "internal" ? (
+          <QuoteTable result={result} />
+        ) : (
+          <div className="p-8">
+            <ExternalQuoteView input={input} result={result} />
+          </div>
+        )}
+      </div>
+
+      {/* 액션 버튼 — 카드 아래 */}
+      <div className="flex items-center justify-between">
+        <button onClick={onBack} className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
+          ← 마진 수정하기
+        </button>
         <div className="flex space-x-3">
           <button
             onClick={downloadPDF}
             disabled={downloading}
-            className="flex items-center space-x-2 px-5 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 disabled:opacity-40 transition-all"
+            className="flex items-center space-x-2 px-5 py-2.5 border-2 border-slate-200 bg-white text-slate-700 rounded-xl text-sm font-bold hover:border-primary hover:text-primary disabled:opacity-40 transition-all"
           >
-            <Download size={16} />
+            <Download size={15} />
             <span>{downloading ? "생성 중..." : "PDF 다운로드"}</span>
           </button>
           <button
             onClick={onReset}
             className="flex items-center space-x-2 px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-black transition-all"
           >
-            <RotateCcw size={16} />
-            <span>새 견적 작성</span>
+            <RotateCcw size={15} />
+            <span>새 견적서 작성</span>
           </button>
         </div>
       </div>
-
-      {/* 탭 컨텐츠 */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-        {tab === "internal" ? (
-          <div>
-            <div className="px-8 py-5 border-b border-slate-50 bg-slate-50/30">
-              <p className="text-[11px] font-black text-slate-400 uppercase">내부용 — 작업 항목별 원가 세부 내역 (외부 공개 금지)</p>
-              <p className="text-xs text-slate-500 mt-1">{input.basicInfo.companyName} · {input.basicInfo.projectName} · {input.basicInfo.date}</p>
-            </div>
-            <div className="p-4">
-              <QuoteTable result={result} />
-            </div>
-          </div>
-        ) : (
-          <div className="p-8">
-            <div className="mb-6 border-b border-slate-50 pb-4">
-              <p className="text-[11px] font-black text-slate-400 uppercase">외부용 — 업체 제출용 견적서 (단가 비공개)</p>
-            </div>
-            <ExternalQuoteView input={input} result={result} />
-          </div>
-        )}
-      </div>
-
-      <button onClick={onBack} className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
-        ← 마진 수정하기
-      </button>
     </div>
   );
 }
