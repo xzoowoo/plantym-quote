@@ -15,6 +15,13 @@ const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) 
 
 const EXTERNAL_GROUPS = [
   {
+    key: "planning",
+    label: "기획 및 설계",
+    icon: "🧭",
+    categories: ["planning"] as const,
+    description: () => "프로젝트 기획, 리서치 및 AI 프롬프트 설계",
+  },
+  {
     key: "image",
     label: "이미지 편집",
     icon: "🖼",
@@ -55,7 +62,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
   const grouped = EXTERNAL_GROUPS.map(group => {
     const amount = result.categorySummary
       .filter(c => (group.categories as readonly string[]).some(cat =>
-        c.label === ({ image: "이미지 제작", video: "영상·모션 제작", motion: "영상·모션 제작", render: "영상·모션 제작", "ai-image": "AI 이미지 생성", "ai-video": "AI 영상 생성" } as Record<string, string>)[cat]
+        c.label === ({ planning: "기획", image: "이미지 제작", video: "영상·모션 제작", motion: "영상·모션 제작", render: "영상·모션 제작", "ai-image": "AI 이미지 생성", "ai-video": "AI 영상 생성" } as Record<string, string>)[cat]
       ))
       .reduce((s, c) => s + c.amount, 0);
 
@@ -197,7 +204,7 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
 
         {/* 카드 콘텐츠 */}
         {tab === "internal" ? (
-          <QuoteTable result={result} />
+          <QuoteTable result={result} input={input} />
         ) : (
           <div className="p-8">
             <ExternalQuoteView input={input} result={result} />

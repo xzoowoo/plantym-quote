@@ -8,6 +8,7 @@ Font.register({
 });
 
 const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: string }> = {
+  planning:   { label: "기획",        english: "Planning" },
   image:      { label: "이미지 제작",  english: "Image Production" },
   video:      { label: "영상 제작",    english: "Video Production" },
   motion:     { label: "모션그래픽",   english: "Motion Graphic" },
@@ -81,9 +82,9 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
   // 카테고리별 그룹화
   const grouped: { category: LineItem["category"]; items: typeof result.lineItems }[] = [];
   for (const lineItem of result.lineItems) {
-    const last = grouped[grouped.length - 1];
-    if (last && last.category === lineItem.category) {
-      last.items.push(lineItem);
+    const group = grouped.find(g => g.category === lineItem.category);
+    if (group) {
+      group.items.push(lineItem);
     } else {
       grouped.push({ category: lineItem.category, items: [lineItem] });
     }
@@ -170,6 +171,10 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
           <Text style={s.totalValue}>{fmt(result.totalPrice)}</Text>
         </View>
 
+        <Text style={s.note}>
+          산출 근거: 기준 단가 188,040원/일(8시간 기준), 23,505원/시간 · 난이도 가중치 하 1.0 / 중 1.5 / 상 2.0 · 근거: 한국디자인산업연합회(KODIA) 2025년 산업별 노임단가표
+          {input.expectedScheduleDays ? `\n본 견적은 예상 제작일정 ${input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.` : ""}
+        </Text>
         <Text style={s.note}>본 문서는 내부 원가 정보를 포함하고 있어 외부 공개를 금합니다. 플랜티엠</Text>
       </Page>
     </Document>

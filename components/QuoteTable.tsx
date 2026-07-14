@@ -1,7 +1,8 @@
 import React from "react";
-import type { QuoteResult, LineItem } from "@/lib/types";
+import type { QuoteInput, QuoteResult, LineItem } from "@/lib/types";
 
 const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: string }> = {
+  planning:   { label: "기획",        english: "Planning" },
   image:      { label: "이미지 제작",  english: "Image Production" },
   video:      { label: "영상 제작",    english: "Video Production" },
   motion:     { label: "모션그래픽",   english: "Motion Graphic" },
@@ -12,12 +13,12 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
-export default function QuoteTable({ result }: { result: QuoteResult }) {
+export default function QuoteTable({ result, input }: { result: QuoteResult; input?: QuoteInput }) {
   const grouped: { category: LineItem["category"]; items: typeof result.lineItems }[] = [];
   for (const lineItem of result.lineItems) {
-    const last = grouped[grouped.length - 1];
-    if (last && last.category === lineItem.category) {
-      last.items.push(lineItem);
+    const group = grouped.find(g => g.category === lineItem.category);
+    if (group) {
+      group.items.push(lineItem);
     } else {
       grouped.push({ category: lineItem.category, items: [lineItem] });
     }
@@ -85,6 +86,12 @@ export default function QuoteTable({ result }: { result: QuoteResult }) {
           </tr>
         </tfoot>
       </table>
+      <div className="px-6 py-4 text-[11px] text-slate-400 leading-relaxed border-t border-slate-100">
+        산출 근거: 기준 단가 188,040원/일(8시간 기준), 23,505원/시간 · 난이도 가중치 하 1.0 / 중 1.5 / 상 2.0 · 근거: 한국디자인산업연합회(KODIA) 2025년 산업별 노임단가표
+        {input?.expectedScheduleDays ? (
+          <span className="block mt-1">본 견적은 예상 제작일정 {input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.</span>
+        ) : null}
+      </div>
     </div>
   );
 }
