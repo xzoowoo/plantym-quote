@@ -40,8 +40,10 @@ const SIZE_OPTIONS = [
   { value: "65인치", label: "65인치" },
   { value: "75인치", label: "75인치" },
   { value: "86인치", label: "86인치" },
-  { value: "custom", label: "기타 (직접입력)" },
+  { value: "custom", label: "기타 사이즈" },
 ];
+
+const PRESET_SIZES = SIZE_OPTIONS.filter(o => o.value !== "custom").map(o => o.value);
 
 const RESOLUTION_OPTIONS = [
   { value: "hd", label: "1280×720 (HD)" },
@@ -52,6 +54,7 @@ const RESOLUTION_OPTIONS = [
 
 export default function Step2Panel({ value, onChange, onNext, onBack }: Props) {
   const valid = value.count > 0 && value.size.trim();
+  const isCustomSize = value.size !== "" && !PRESET_SIZES.includes(value.size);
 
   return (
     <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
@@ -71,12 +74,23 @@ export default function Step2Panel({ value, onChange, onNext, onBack }: Props) {
               className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl py-3.5 px-5 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-primary/5 focus:border-primary/20 focus:bg-white transition-all outline-none"
             />
           </div>
-          <SelectField
-            label="패널 사이즈 (인치)"
-            value={value.size}
-            onChange={v => onChange({ ...value, size: v })}
-            options={SIZE_OPTIONS}
-          />
+          <div className="space-y-2">
+            <SelectField
+              label="패널 사이즈 (인치)"
+              value={isCustomSize ? "custom" : value.size}
+              onChange={v => onChange({ ...value, size: v === "custom" ? "" : v })}
+              options={SIZE_OPTIONS}
+            />
+            {isCustomSize && (
+              <input
+                type="text"
+                placeholder="예: 70인치"
+                value={value.size}
+                onChange={e => onChange({ ...value, size: e.target.value })}
+                className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl py-3 px-4 text-sm font-bold text-slate-700 outline-none focus:border-primary/30 focus:bg-white transition-all"
+              />
+            )}
+          </div>
         </div>
 
         {/* 방향 + 해상도 */}
