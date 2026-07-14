@@ -52,9 +52,12 @@ const RESOLUTION_OPTIONS = [
   { value: "custom", label: "기타 해상도" },
 ];
 
+const PRESET_RESOLUTIONS = RESOLUTION_OPTIONS.filter(o => o.value !== "custom").map(o => o.value);
+
 export default function Step2Panel({ value, onChange, onNext, onBack }: Props) {
   const valid = value.count > 0 && value.size.trim();
   const isCustomSize = value.size !== "" && !PRESET_SIZES.includes(value.size);
+  const isCustomResolution = value.resolution !== "" && !PRESET_RESOLUTIONS.includes(value.resolution);
 
   return (
     <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
@@ -112,12 +115,23 @@ export default function Step2Panel({ value, onChange, onNext, onBack }: Props) {
               ))}
             </div>
           </div>
-          <SelectField
-            label="패널 해상도 (규격)"
-            value={value.resolution}
-            onChange={v => onChange({ ...value, resolution: v })}
-            options={RESOLUTION_OPTIONS}
-          />
+          <div className="space-y-2">
+            <SelectField
+              label="패널 해상도 (규격)"
+              value={isCustomResolution ? "custom" : value.resolution}
+              onChange={v => onChange({ ...value, resolution: v === "custom" ? "" : v })}
+              options={RESOLUTION_OPTIONS}
+            />
+            {isCustomResolution && (
+              <input
+                type="text"
+                placeholder="예: 2560×1440"
+                value={value.resolution}
+                onChange={e => onChange({ ...value, resolution: e.target.value })}
+                className="w-full bg-slate-50 border-2 border-slate-50 rounded-2xl py-3 px-4 text-sm font-bold text-slate-700 outline-none focus:border-primary/30 focus:bg-white transition-all"
+              />
+            )}
+          </div>
         </div>
 
         {/* 비디오월 */}
