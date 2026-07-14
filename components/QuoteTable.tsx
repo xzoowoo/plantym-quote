@@ -36,8 +36,8 @@ export default function QuoteTable({ result, input }: { result: QuoteResult; inp
             <th className="px-6 py-4 text-[11px] font-bold text-slate-400">작업 항목</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[80px]">기준</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[60px]">수량</th>
-            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[110px]">단가</th>
-            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[120px] pr-6">합계</th>
+            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[130px]">단가</th>
+            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[150px] pr-6">합계</th>
           </tr>
         </thead>
         <tbody>
@@ -61,8 +61,8 @@ export default function QuoteTable({ result, input }: { result: QuoteResult; inp
                     <td className="px-6 py-4 pl-8 text-[13px] font-medium text-slate-800">{lineItem.name}</td>
                     <td className="px-4 py-4 text-[12px] text-slate-400 text-center">{lineItem.unit}</td>
                     <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">{lineItem.quantity}</td>
-                    <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono">{fmt(lineItem.unitCost)}</td>
-                    <td className="px-4 py-4 text-[13px] font-bold text-slate-900 text-right font-mono pr-6">{fmt(lineItem.totalCost)}</td>
+                    <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono whitespace-nowrap">{fmt(lineItem.unitCost)}</td>
+                    <td className="px-4 py-4 text-[13px] font-bold text-slate-900 text-right font-mono pr-6 whitespace-nowrap">{fmt(lineItem.totalCost)}</td>
                   </tr>
                 ))}
               </React.Fragment>
@@ -72,7 +72,7 @@ export default function QuoteTable({ result, input }: { result: QuoteResult; inp
         <tfoot>
           <tr className="border-t border-slate-100">
             <td colSpan={4} className="px-6 py-5 text-right text-[13px] text-slate-500 font-medium">원가 소계</td>
-            <td className="px-4 py-5 text-right font-mono font-black text-slate-900 text-[15px] pr-6">{fmt(result.costSubtotal)}</td>
+            <td className="px-4 py-5 text-right font-mono font-black text-slate-900 text-[15px] pr-6 whitespace-nowrap">{fmt(result.costSubtotal)}</td>
           </tr>
           {result.marginAmount > 0 && (
             <tr>
@@ -82,12 +82,15 @@ export default function QuoteTable({ result, input }: { result: QuoteResult; inp
           )}
           <tr className="bg-primary/5">
             <td colSpan={4} className="px-6 py-5 text-right font-black text-slate-900 text-[14px]">최종 견적가 (VAT 별도)</td>
-            <td className="px-4 py-5 text-right font-mono font-black text-primary text-[15px] pr-6">{fmt(result.totalPrice)}</td>
+            <td className="px-4 py-5 text-right font-mono font-black text-primary text-[15px] pr-6 whitespace-nowrap">{fmt(result.totalPrice)}</td>
           </tr>
         </tfoot>
       </table>
       <div className="px-6 py-4 text-[11px] text-slate-400 leading-relaxed border-t border-slate-100">
         산출 근거: 기준 단가 188,040원/일(8시간 기준), 23,505원/시간 · 난이도 가중치 하 1.0 / 중 1.5 / 상 2.0 · 근거: 한국디자인산업연합회(KODIA) 2025년 산업별 노임단가표
+        <span className="block mt-1">
+          AI 생성비 산출 근거: 작업비(기획·리서치, 프롬프트 설계, 생성·선별, 후보정·합성)는 위와 동일한 기준 단가·난이도로 산정 · AI 솔루션 사용료는 Midjourney Mega Plan · Gemini Ultra Plan 기준, 이미지 생성 130원/건 · 영상 생성 2,170원/건(환율 1,550원/USD, 2026-07-01 기준)
+        </span>
         {input?.expectedScheduleDays ? (
           <span className="block mt-1">본 견적은 예상 제작일정 {input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.</span>
         ) : null}

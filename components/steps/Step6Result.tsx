@@ -94,13 +94,13 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
       {/* 견적 테이블 */}
       <div className="border border-slate-100 rounded-2xl overflow-x-auto">
         <div className="min-w-[500px]">
-          <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-slate-50 border-b border-slate-100">
+          <div className="grid grid-cols-[160px_1fr_1fr_150px] bg-slate-50 border-b border-slate-100">
             {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
               <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
             ))}
           </div>
           {grouped.map((group, i) => (
-            <div key={group.key} className={`grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
+            <div key={group.key} className={`grid grid-cols-[160px_1fr_1fr_150px] border-b border-slate-50 ${i % 2 === 0 ? "bg-white" : "bg-slate-50/30"}`}>
               <div className="px-4 py-5 flex items-center space-x-2">
                 <span className="text-lg shrink-0">{group.icon}</span>
                 <span className="text-[13px] font-black text-slate-700">{group.label}</span>
@@ -112,26 +112,26 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
               <div className="px-4 py-5 text-[12px] text-slate-400">
                 {group.description(group.itemNames)}
               </div>
-              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">
+              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">
                 {fmt(group.amount)}
               </div>
             </div>
           ))}
           {result.marginAmount > 0 && (
-            <div className="grid grid-cols-[160px_1fr_1fr_120px] border-b border-slate-50 bg-white">
+            <div className="grid grid-cols-[160px_1fr_1fr_150px] border-b border-slate-50 bg-white">
               <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
               <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
               <div className="px-4 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
-              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono">{fmt(result.marginAmount)}</div>
+              <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">{fmt(result.marginAmount)}</div>
             </div>
           )}
           {/* 총 합계 — 테이블 맨 하단 */}
-          <div className="grid grid-cols-[160px_1fr_1fr_120px] bg-primary/5 border-t-2 border-primary/20">
+          <div className="grid grid-cols-[160px_1fr_1fr_150px] bg-primary/5 border-t-2 border-primary/20">
             <div className="px-4 py-5 col-span-3 flex items-center justify-end pr-6 text-[13px] font-black text-slate-700">
               총 견적 합계
               <span className="text-[11px] font-medium text-slate-400 ml-2">* VAT 별도</span>
             </div>
-            <div className="px-4 py-5 text-[15px] font-black text-primary font-mono">{fmt(result.totalPrice)}</div>
+            <div className="px-4 py-5 text-[15px] font-black text-primary font-mono whitespace-nowrap">{fmt(result.totalPrice)}</div>
           </div>
         </div>
       </div>

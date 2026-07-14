@@ -56,8 +56,8 @@ const PRESET_RESOLUTIONS = RESOLUTION_OPTIONS.filter(o => o.value !== "custom").
 
 export default function Step2Panel({ value, onChange, onNext, onBack }: Props) {
   const valid = value.count > 0 && value.size.trim();
-  const isCustomSize = value.size !== "" && !PRESET_SIZES.includes(value.size);
-  const isCustomResolution = value.resolution !== "" && !PRESET_RESOLUTIONS.includes(value.resolution);
+  const isCustomSize = !PRESET_SIZES.includes(value.size);
+  const isCustomResolution = !PRESET_RESOLUTIONS.includes(value.resolution);
 
   return (
     <div className="w-full bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
