@@ -23,16 +23,16 @@ const s = StyleSheet.create({
   page: { padding: 48, fontFamily: "NotoSansKR", fontSize: 10, color: "#333" },
   badge: {
     alignSelf: "flex-start", backgroundColor: "#fef3c7", color: "#92400e",
-    fontSize: 8, fontWeight: "bold", paddingHorizontal: 8, paddingVertical: 3,
+    fontSize: 8, paddingHorizontal: 8, paddingVertical: 3,
     borderRadius: 4, marginBottom: 16,
   },
-  title: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+  title: { fontSize: 19, marginBottom: 4 },
   subtitle: { fontSize: 11, color: "#666", marginBottom: 16 },
   infoGrid: { flexDirection: "row", gap: 12, marginBottom: 24 },
   infoItem: { flex: 1 },
   infoLabel: { fontSize: 8, color: "#9ca3af", marginBottom: 2 },
-  infoValue: { fontSize: 10, fontWeight: "bold" },
-  sectionTitle: { fontSize: 12, fontWeight: "bold", marginBottom: 8, color: "#1a56db" },
+  infoValue: { fontSize: 11, color: "#111827" },
+  sectionTitle: { fontSize: 13, marginBottom: 8, color: "#1a56db" },
   // 테이블 헤더
   headerRow: {
     flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#e5e7eb",
@@ -45,7 +45,7 @@ const s = StyleSheet.create({
   hTotal:    { width: 85,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
   // 카테고리 그룹 헤더
   catRow: { paddingTop: 14, paddingHorizontal: 6, paddingBottom: 0 },
-  catLabel: { fontSize: 10, fontWeight: "bold", color: "#4b5563" },
+  catLabel: { fontSize: 11, color: "#374151" },
   catEnglish: { fontSize: 9, color: "#9ca3af" },
   catLine: { borderBottomWidth: 1, borderBottomColor: "#d1d5db", marginTop: 5 },
   // 항목 행
@@ -73,7 +73,7 @@ const s = StyleSheet.create({
     flexDirection: "row", paddingVertical: 8, paddingHorizontal: 6,
     borderTopWidth: 2, borderTopColor: "#1a56db", marginTop: 2,
   },
-  totalLabel: { flex: 1, textAlign: "right", fontSize: 11, fontWeight: "bold", color: "#1a56db", paddingRight: 8 },
+  totalLabel: { flex: 1, textAlign: "right", fontSize: 12, color: "#1a56db", paddingRight: 8 },
   totalValue: { width: 85, textAlign: "right", fontSize: 11, fontWeight: "bold", color: "#1a56db" },
   note: { fontSize: 8, color: "#9ca3af", marginTop: 24 },
 });

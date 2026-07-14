@@ -65,7 +65,7 @@ describe("calculateQuote", () => {
     expect(result.totalPrice).toBe(result.costSubtotal + result.marginAmount);
   });
 
-  test("패널 2개 → 이미지 항목 비용 × 2", () => {
+  test("패널 수가 늘어도 이미지 작업 비용은 그대로 (이미지 수만 반영)", () => {
     const input: QuoteInput = {
       ...baseInput,
       panelInfo: { count: 2, size: "55인치", orientation: "horizontal", resolution: "fhd", isVideoWall: false },
@@ -74,7 +74,18 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "배경 제거(누끼)");
-    expect(item!.totalCost).toBe(11753 * 2);
+    expect(item!.totalCost).toBe(11753);
+  });
+
+  test("사이즈 변경 4장 → 392 × 4 (1장 단가)", () => {
+    const input: QuoteInput = {
+      ...baseInput,
+      contentTypes: ["image"],
+      imageDetails: { hasSource: true, imageCount: 4, tasks: ["resize"] },
+    };
+    const result = calculateQuote(input);
+    const item = result.lineItems.find((i) => i.name === "사이즈 변경");
+    expect(item!.totalCost).toBe(392 * 4);
   });
 
   test("등장효과 기본 3건 → 3,918 × 3", () => {

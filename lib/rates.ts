@@ -18,7 +18,7 @@ export interface RateItem {
 export const RATES = {
   image: {
     research:      { name: "소스 리서치",        unit: "1건", cost: c(60, "low") },
-    resize:        { name: "사이즈 변경",         unit: "5장", cost: c(1,  "low", 5) },
+    resize:        { name: "사이즈 변경",         unit: "1장", cost: c(1,  "low") },
     removeBg:      { name: "배경 제거(누끼)",     unit: "1장", cost: c(20, "mid") },
     separate:      { name: "소스 분리",           unit: "1장", cost: c(30, "mid") },
     reposition:    { name: "소스 재배치",         unit: "1장", cost: c(30, "mid") },

@@ -80,24 +80,23 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     const n = img.imageCount;
 
     if (!img.hasSource) {
-      push(item("image", RATES.image.research, 1, true, p));
+      push(item("image", RATES.image.research, 1, false, 1));
     }
     if (img.tasks.includes("resize") && n > 0) {
-      const sets = Math.max(1, Math.ceil(n / 5));
-      push(item("image", RATES.image.resize, sets, true, p));
+      push(item("image", RATES.image.resize, n, false, 1));
     }
     if (img.tasks.includes("remove-bg"))
-      push(item("image", RATES.image.removeBg, n, true, p));
+      push(item("image", RATES.image.removeBg, n, false, 1));
     if (img.tasks.includes("separate"))
-      push(item("image", RATES.image.separate, n, true, p));
+      push(item("image", RATES.image.separate, n, false, 1));
     if (img.tasks.includes("reposition"))
-      push(item("image", RATES.image.reposition, n, true, p));
+      push(item("image", RATES.image.reposition, n, false, 1));
     if (img.tasks.includes("composite"))
-      push(item("image", RATES.image.composite, n, true, p));
+      push(item("image", RATES.image.composite, n, false, 1));
     if (img.tasks.includes("text"))
-      push(item("image", RATES.image.text, n, true, p));
+      push(item("image", RATES.image.text, n, false, 1));
     if (img.tasks.includes("design-element"))
-      push(item("image", RATES.image.designElement, n, true, p));
+      push(item("image", RATES.image.designElement, n, false, 1));
   }
 
   if (input.contentTypes.includes("video") && input.videoDetails) {
