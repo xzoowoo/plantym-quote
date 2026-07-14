@@ -1,6 +1,7 @@
 "use client";
 import { Minus, Plus } from "lucide-react";
 import type { ImageDetails, VideoDetails, AIImageDetails, AIVideoDetails, ContentType, EffectLevel, ImageTask } from "@/lib/types";
+import InfoTooltip from "@/components/InfoTooltip";
 
 interface Props {
   contentTypes: ContentType[];
@@ -44,13 +45,13 @@ function CounterRow({ label, value, onChange }: { label: string; value: number; 
   );
 }
 
-function EffectRow({ label, value, count, onChange, onCountChange }: {
-  label: string; value: EffectLevel; count: number;
+function EffectRow({ label, value, count, help, onChange, onCountChange }: {
+  label: string; value: EffectLevel; count: number; help: string;
   onChange: (v: EffectLevel) => void; onCountChange: (n: number) => void;
 }) {
   return (
     <div className="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl">
-      <span className="text-[13px] text-slate-700 font-bold w-20 shrink-0">{label}</span>
+      <span className="text-[13px] text-slate-700 font-bold w-20 shrink-0 flex items-center">{label}<InfoTooltip text={help} /></span>
       <div className="flex items-center space-x-4">
         {value !== "none" && (
           <div className="flex items-center space-x-1">
@@ -91,6 +92,30 @@ const IMAGE_TASKS: { value: ImageTask; label: string }[] = [
   { value: "text",           label: "텍스트 추가" },
   { value: "design-element", label: "디자인 요소 추가" },
 ];
+
+const IMAGE_TASK_HELP: Record<ImageTask, string> = {
+  resize: "이미지의 가로세로 비율이나 크기를 패널 화면에 맞게 조정하는 작업",
+  "remove-bg": "이미지에서 배경을 지우고 피사체만 남기는 작업",
+  separate: "이미지 안의 요소들을 레이어별로 분리해서 따로 편집할 수 있게 만드는 작업",
+  reposition: "가로형 이미지를 세로형으로(또는 반대로) 배치를 다시 잡는 작업",
+  composite: "여러 이미지 요소를 하나의 장면으로 합치는 작업",
+  text: "이미지에 문구나 타이틀 텍스트를 삽입하는 작업",
+  "design-element": "아이콘, 도형, 장식 그래픽 등을 추가하는 작업",
+};
+
+const VIDEO_TOGGLE_HELP: Record<string, string> = {
+  cutEdit: "촬영/소스 영상을 필요한 구간만 잘라 이어붙이는 기본 편집",
+  subtitle: "영상에 자막이나 캡션 텍스트를 넣는 작업",
+  usbConvert: "LG 패널 등에서 재생 가능한 형식으로 파일을 변환하는 작업",
+};
+
+const MOTION_HELP: Record<string, string> = {
+  transition: "장면과 장면 사이를 자연스럽게 이어주는 전환 효과",
+  entrance: "요소(글자, 이미지 등)가 화면에 처음 나타날 때 주는 움직임 효과",
+  emphasis: "특정 요소를 부각시키기 위한 강조 움직임(반짝임, 확대 등)",
+  special: "연기, 물방울, 빛 번짐 등 시각적으로 특별한 연출 효과",
+  animation: "요소가 움직이며 이야기를 전달하는 모션그래픽 애니메이션",
+};
 
 export default function Step4Details({
   contentTypes, imageDetails, videoDetails, aiImageDetails, aiVideoDetails,
@@ -135,7 +160,7 @@ export default function Step4Details({
                 {IMAGE_TASKS.map(({ value: t, label }) => (
                   <label key={t} className="flex items-center space-x-2 text-[13px] text-slate-600 cursor-pointer p-2 hover:bg-slate-50 rounded-xl">
                     <input type="checkbox" className="w-4 h-4 rounded accent-primary" checked={imageDetails.tasks.includes(t)} onChange={() => toggleImageTask(t)} />
-                    <span>{label}</span>
+                    <span className="flex items-center">{label}<InfoTooltip text={IMAGE_TASK_HELP[t]} /></span>
                   </label>
                 ))}
               </div>
@@ -163,13 +188,13 @@ export default function Step4Details({
                   <input type="checkbox" className="w-4 h-4 rounded accent-primary"
                     checked={videoDetails[key as keyof VideoDetails] as boolean}
                     onChange={e => onChangeVideo({ ...videoDetails, [key]: e.target.checked })} />
-                  <span>{label}</span>
+                  <span className="flex items-center">{label}<InfoTooltip text={VIDEO_TOGGLE_HELP[key]} /></span>
                 </label>
               ))}
               <label className="flex items-center space-x-2 text-[13px] text-slate-600 cursor-pointer p-2 hover:bg-slate-50 rounded-xl col-span-2">
                 <input type="checkbox" className="w-4 h-4 rounded accent-primary" checked={videoDetails.rolling}
                   onChange={e => onChangeVideo({ ...videoDetails, rolling: e.target.checked })} />
-                <span>이미지/영상 롤링</span>
+                <span className="flex items-center">이미지/영상 롤링<InfoTooltip text="여러 장의 이미지나 영상을 순서대로 자동 전환하며 보여주는 롤링 연출" /></span>
                 {videoDetails.rolling && (
                   <input type="number" placeholder="장수" value={videoDetails.rollingCount || ""}
                     onChange={e => onChangeVideo({ ...videoDetails, rollingCount: Number(e.target.value) })}
@@ -189,13 +214,14 @@ export default function Step4Details({
                 <EffectRow key={key} label={label}
                   value={videoDetails[key as keyof VideoDetails] as EffectLevel}
                   count={videoDetails[countKey as keyof VideoDetails] as number}
+                  help={MOTION_HELP[key]}
                   onChange={v => onChangeVideo({ ...videoDetails, [key]: v })}
                   onCountChange={n => onChangeVideo({ ...videoDetails, [countKey]: n })}
                 />
               ))}
             </div>
             <div>
-              <p className="text-[11px] font-black text-slate-400 uppercase mb-2">출력 품질</p>
+              <p className="text-[11px] font-black text-slate-400 uppercase mb-2 flex items-center">출력 품질<InfoTooltip text="최종 영상 파일의 해상도 기준 (Full HD 또는 4K)" /></p>
               <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
                 {[{ v: "fhd", label: "Full HD" }, { v: "4k", label: "4K 이상" }].map(({ v, label }) => (
                   <button key={v} onClick={() => onChangeVideo({ ...videoDetails, renderQuality: v as "fhd" | "4k" })}
