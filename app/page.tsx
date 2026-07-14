@@ -168,6 +168,8 @@ export default function Page() {
           <Step5Margin
             marginRate={input.marginRate}
             onChange={(v) => setInput({ ...input, marginRate: v })}
+            expectedScheduleDays={input.expectedScheduleDays}
+            onChangeSchedule={(v) => setInput({ ...input, expectedScheduleDays: v })}
             previewSubtotal={previewSubtotal}
             onNext={handleNext}
             onBack={() => setStep(4)}

@@ -3,6 +3,8 @@
 interface Props {
   marginRate: number;
   onChange: (v: number) => void;
+  expectedScheduleDays?: number;
+  onChangeSchedule: (v: number | undefined) => void;
   previewSubtotal: number;
   onNext: () => void;
   onBack: () => void;
@@ -10,7 +12,7 @@ interface Props {
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
-export default function Step5Margin({ marginRate, onChange, previewSubtotal, onNext, onBack }: Props) {
+export default function Step5Margin({ marginRate, onChange, expectedScheduleDays, onChangeSchedule, previewSubtotal, onNext, onBack }: Props) {
   const marginAmount = Math.round(previewSubtotal * marginRate / 100);
   const total = previewSubtotal + marginAmount;
 
@@ -35,6 +37,25 @@ export default function Step5Margin({ marginRate, onChange, previewSubtotal, onN
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 block">예상 제작일정 (선택, 워크데이 기준)</label>
+          <div className="flex items-center space-x-3">
+            <input
+              type="number"
+              min={0}
+              placeholder="예: 10"
+              value={expectedScheduleDays ?? ""}
+              onChange={e => {
+                const v = e.target.value;
+                onChangeSchedule(v === "" ? undefined : Number(v));
+              }}
+              className="w-32 border border-slate-200 rounded-xl px-4 py-2 text-lg font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <span className="text-sm text-slate-400 font-medium">일</span>
+          </div>
+          <p className="text-[12px] text-slate-400 mt-2">입력하지 않으면 항목별 기본 단가로 자동 계산됩니다. 입력하면 선택한 항목들의 비율은 유지한 채 전체 금액이 이 일정에 맞춰 재조정됩니다.</p>
         </div>
 
         {previewSubtotal > 0 && (
