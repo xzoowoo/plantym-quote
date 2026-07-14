@@ -1,23 +1,24 @@
-const DAILY_RATE = 188040;
+export const DAILY_RATE = 188040;
 const MIN_RATE = DAILY_RATE / 480;
 
 type Difficulty = "low" | "mid" | "high";
 const DIFFICULTY: Record<Difficulty, number> = { low: 1.0, mid: 1.5, high: 2.0 };
 
-function c(minutes: number, d: Difficulty): number {
-  return Math.round(minutes * MIN_RATE * DIFFICULTY[d]);
+function c(minutes: number, d: Difficulty, baseQty: number = 1): number {
+  return Math.round(minutes * MIN_RATE * DIFFICULTY[d] * baseQty);
 }
 
 export interface RateItem {
   name: string;
   unit: string;
   cost: number;
+  usageFee?: number;
 }
 
 export const RATES = {
   image: {
     research:      { name: "소스 리서치",        unit: "1건", cost: c(60, "low") },
-    resize:        { name: "사이즈 변경",         unit: "5장", cost: c(1,  "low") },
+    resize:        { name: "사이즈 변경",         unit: "5장", cost: c(1,  "low", 5) },
     removeBg:      { name: "배경 제거(누끼)",     unit: "1장", cost: c(20, "mid") },
     separate:      { name: "소스 분리",           unit: "1장", cost: c(30, "mid") },
     reposition:    { name: "소스 재배치",         unit: "1장", cost: c(30, "mid") },
@@ -28,9 +29,9 @@ export const RATES = {
   video: {
     cutEdit:  { name: "컷 편집",   unit: "1분", cost: c(5,  "low") },
     subtitle: { name: "자막 삽입", unit: "1분", cost: c(10, "low") },
-    rolling:  { name: "롤링",      unit: "1장", cost: Math.round(c(5, "low") / 10) },
   },
   motion: {
+    rolling:            { name: "롤링",        unit: "1장", cost: c(5, "low") },
     transitionBasic:    { name: "화면전환 기본",   unit: "1건", cost: c(1,   "low")  },
     transitionAdvanced: { name: "화면전환 고급",   unit: "1건", cost: c(30,  "mid")  },
     entranceBasic:      { name: "등장효과 기본",   unit: "1건", cost: c(10,  "low")  },
@@ -38,7 +39,7 @@ export const RATES = {
     emphasisBasic:      { name: "강조효과 기본",   unit: "1건", cost: c(10,  "low")  },
     emphasisAdvanced:   { name: "강조효과 고급",   unit: "1건", cost: c(45,  "mid")  },
     specialBasic:       { name: "특수효과 기본",   unit: "1건", cost: c(5,   "mid")  },
-    specialAdvanced:    { name: "특수효과 고급",   unit: "1장", cost: c(150, "high") },
+    specialAdvanced:    { name: "특수효과 고급",   unit: "1건", cost: c(150, "high") },
     animationBasic:     { name: "애니메이션 기본", unit: "1건", cost: c(10,  "low")  },
     animationAdvanced:  { name: "애니메이션 고급", unit: "1건", cost: c(165, "high") },
   },
@@ -53,7 +54,14 @@ export const RATES = {
     usb:        { name: "USB 변환",  unit: "1개", cost: c(5, "low") },
   },
   ai: {
-    image: { name: "AI 이미지 생성", unit: "1건", cost: 43675 },
-    video: { name: "AI 영상 생성",   unit: "1건", cost: 100503 },
+    // 플랜티엠_콘텐츠제작단가표_260701 'AI 이미지 생성 견적 예시(이미지 1장 제작)' 기준
+    // 기획·리서치 11,752.5(30분,하) + 프롬프트 엔지니어링 11,752.5(20분,중) + 생성·선별 3,917.5(10분,하)
+    // + 후보정·합성 11,752.5(20분,중) = 39,175(작업비) / AI 솔루션 사용료(10건×130원) = 1,300
+    image: { name: "AI 이미지 생성", unit: "1건", cost: 39175, usageFee: 1300 },
+    // 글로리서울 견적서(260702) 'AI 영상 생성(입구패널영상)' 실 청구 기준, 20일 프로젝트 1건 완성 기준
+    // 기획·리서치 188,040 + 프롬프트 엔지니어링 141,030 + 생성·선별 1,880,400 + 후보정·합성 2,820,600 = 5,030,070(작업비)
+    // AI 솔루션 사용료(참고이미지 240건×130원=31,200 + 영상 480건×2,170원=1,041,600) = 1,072,800
+    // (Gemini API 월간 예산 및 비용 시뮬레이터_수정 기준, 환율 1,550원/USD, 2026-07-01)
+    video: { name: "AI 영상 생성",   unit: "1건", cost: 5030070, usageFee: 1072800 },
   },
 } as const;

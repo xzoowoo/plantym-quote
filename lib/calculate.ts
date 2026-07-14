@@ -1,5 +1,5 @@
 import type { QuoteInput, QuoteResult, LineItem, CategorySummary } from "@/lib/types";
-import { RATES } from "@/lib/rates";
+import { RATES, DAILY_RATE } from "@/lib/rates";
 
 function item(
   category: LineItem["category"],
@@ -16,6 +16,26 @@ function item(
     quantity: effectiveQty,
     unitCost: rate.cost,
     totalCost: rate.cost * effectiveQty,
+  };
+}
+
+function aiItem(
+  category: "ai-image" | "ai-video",
+  rate: { name: string; unit: string; cost: number; usageFee?: number },
+  quantity: number
+): { line: LineItem; fixedPortion: number } {
+  const fee = rate.usageFee ?? 0;
+  const totalCost = (rate.cost + fee) * quantity;
+  return {
+    line: {
+      category,
+      name: rate.name,
+      unit: rate.unit,
+      quantity,
+      unitCost: rate.cost + fee,
+      totalCost,
+    },
+    fixedPortion: fee * quantity,
   };
 }
 
@@ -38,6 +58,12 @@ function buildSummary(items: LineItem[]): CategorySummary[] {
 
 export function calculateQuote(input: QuoteInput): QuoteResult {
   const items: LineItem[] = [];
+  const fixedPortions: number[] = [];
+  const push = (line: LineItem, fixedPortion = 0) => {
+    items.push(line);
+    fixedPortions.push(fixedPortion);
+  };
+
   const p = input.panelInfo.count;
   const durationMin = Math.max(1, Math.ceil((input.videoDetails?.durationSeconds ?? 0) / 60));
 
@@ -46,80 +72,99 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     const n = img.imageCount;
 
     if (!img.hasSource) {
-      items.push(item("image", RATES.image.research, 1, true, p));
+      push(item("image", RATES.image.research, 1, true, p));
     }
     if (img.tasks.includes("resize") && n > 0) {
       const sets = Math.max(1, Math.ceil(n / 5));
-      items.push(item("image", RATES.image.resize, sets, true, p));
+      push(item("image", RATES.image.resize, sets, true, p));
     }
     if (img.tasks.includes("remove-bg"))
-      items.push(item("image", RATES.image.removeBg, n, true, p));
+      push(item("image", RATES.image.removeBg, n, true, p));
     if (img.tasks.includes("separate"))
-      items.push(item("image", RATES.image.separate, n, true, p));
+      push(item("image", RATES.image.separate, n, true, p));
     if (img.tasks.includes("reposition"))
-      items.push(item("image", RATES.image.reposition, n, true, p));
+      push(item("image", RATES.image.reposition, n, true, p));
     if (img.tasks.includes("composite"))
-      items.push(item("image", RATES.image.composite, n, true, p));
+      push(item("image", RATES.image.composite, n, true, p));
     if (img.tasks.includes("text"))
-      items.push(item("image", RATES.image.text, n, true, p));
+      push(item("image", RATES.image.text, n, true, p));
     if (img.tasks.includes("design-element"))
-      items.push(item("image", RATES.image.designElement, n, true, p));
+      push(item("image", RATES.image.designElement, n, true, p));
   }
 
   if (input.contentTypes.includes("video") && input.videoDetails) {
     const vid = input.videoDetails;
 
     if (vid.cutEdit)
-      items.push(item("video", RATES.video.cutEdit, durationMin, false, p));
+      push(item("video", RATES.video.cutEdit, durationMin, false, p));
     if (vid.subtitle)
-      items.push(item("video", RATES.video.subtitle, durationMin, false, p));
+      push(item("video", RATES.video.subtitle, durationMin, false, p));
     if (vid.rolling && vid.rollingCount > 0)
-      items.push(item("video", RATES.video.rolling, vid.rollingCount, false, p));
+      push(item("motion", RATES.motion.rolling, vid.rollingCount, false, p));
 
     if (vid.transition !== "none") {
       const r = vid.transition === "basic" ? RATES.motion.transitionBasic : RATES.motion.transitionAdvanced;
-      items.push(item("motion", r, vid.transitionCount, false, p));
+      push(item("motion", r, vid.transitionCount, false, p));
     }
     if (vid.entrance !== "none") {
       const r = vid.entrance === "basic" ? RATES.motion.entranceBasic : RATES.motion.entranceAdvanced;
-      items.push(item("motion", r, vid.entranceCount, false, p));
+      push(item("motion", r, vid.entranceCount, false, p));
     }
     if (vid.emphasis !== "none") {
       const r = vid.emphasis === "basic" ? RATES.motion.emphasisBasic : RATES.motion.emphasisAdvanced;
-      items.push(item("motion", r, vid.emphasisCount, false, p));
+      push(item("motion", r, vid.emphasisCount, false, p));
     }
     if (vid.special !== "none") {
       const r = vid.special === "basic" ? RATES.motion.specialBasic : RATES.motion.specialAdvanced;
-      items.push(item("motion", r, vid.specialCount, false, p));
+      push(item("motion", r, vid.specialCount, false, p));
     }
     if (vid.animation !== "none") {
       const r = vid.animation === "basic" ? RATES.motion.animationBasic : RATES.motion.animationAdvanced;
-      items.push(item("motion", r, vid.animationCount, false, p));
+      push(item("motion", r, vid.animationCount, false, p));
     }
 
     const renderRate = vid.renderQuality === "4k" ? RATES.render.k4 : RATES.render.fhd;
-    items.push(item("render", renderRate, durationMin, false, 1));
-    items.push(item("render", RATES.render.mp4Convert, durationMin, false, 1));
+    push(item("render", renderRate, durationMin, false, 1));
+    push(item("render", RATES.render.mp4Convert, durationMin, false, 1));
     if (vid.usbConvert)
-      items.push(item("render", RATES.render.usb, 1, false, 1));
+      push(item("render", RATES.render.usb, 1, false, 1));
   }
 
   if (input.panelInfo.isVideoWall) {
     const r = p > 2 ? RATES.videoWall.advanced : RATES.videoWall.basic;
-    items.push(item("motion", r, 1, false, 1));
+    push(item("motion", r, 1, false, 1));
   }
 
   if (input.contentTypes.includes("ai-image") && input.aiImageDetails.count > 0) {
-    items.push(item("ai-image", RATES.ai.image, input.aiImageDetails.count, false, 1));
+    const { line, fixedPortion } = aiItem("ai-image", RATES.ai.image, input.aiImageDetails.count);
+    push(line, fixedPortion);
   }
 
   if (input.contentTypes.includes("ai-video") && input.aiVideoDetails.count > 0) {
-    items.push(item("ai-video", RATES.ai.video, input.aiVideoDetails.count, false, 1));
+    const { line, fixedPortion } = aiItem("ai-video", RATES.ai.video, input.aiVideoDetails.count);
+    push(line, fixedPortion);
   }
 
-  const filteredItems = items.filter(i => i.quantity > 0 && i.totalCost > 0);
+  const keepIdx = items.map((_, i) => i).filter(i => items[i].quantity > 0 && items[i].totalCost > 0);
+  let filteredItems = keepIdx.map(i => items[i]);
+  const filteredFixed = keepIdx.map(i => fixedPortions[i]);
 
-  const costSubtotal = items.reduce((s, i) => s + i.totalCost, 0);
+  const schedule = input.expectedScheduleDays;
+  if (schedule && schedule > 0) {
+    const scalableSum = filteredItems.reduce((s, it, i) => s + (it.totalCost - filteredFixed[i]), 0);
+    if (scalableSum > 0) {
+      const targetBudget = schedule * DAILY_RATE;
+      const scaleFactor = targetBudget / scalableSum;
+      filteredItems = filteredItems.map((it, i) => {
+        const fixed = filteredFixed[i];
+        const scalable = it.totalCost - fixed;
+        const totalCost = Math.round(scalable * scaleFactor + fixed);
+        return { ...it, totalCost, unitCost: Math.round(totalCost / it.quantity) };
+      });
+    }
+  }
+
+  const costSubtotal = filteredItems.reduce((s, i) => s + i.totalCost, 0);
   const marginAmount = Math.round(costSubtotal * input.marginRate / 100);
   const totalPrice = costSubtotal + marginAmount;
 

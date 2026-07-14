@@ -70,6 +70,7 @@ export interface QuoteInput {
   aiVideoDetails: AIVideoDetails;
   freeText: string;
   marginRate: number;
+  expectedScheduleDays?: number;
 }
 
 export interface LineItem {
