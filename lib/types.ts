@@ -74,7 +74,7 @@ export interface QuoteInput {
 }
 
 export interface LineItem {
-  category: "image" | "video" | "motion" | "render" | "ai-image" | "ai-video";
+  category: "planning" | "image" | "video" | "motion" | "render" | "ai-image" | "ai-video";
   name: string;
   unit: string;
   quantity: number;

@@ -94,7 +94,7 @@ describe("calculateQuote", () => {
     expect(item!.totalCost).toBe(3918 * 3);
   });
 
-  test("AI 이미지 2건 → 40,475 × 2", () => {
+  test("AI 이미지 2건 → 16,970 × 2", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["ai-image"],
@@ -102,7 +102,7 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "AI 이미지 생성");
-    expect(item!.totalCost).toBe(40475 * 2);
+    expect(item!.totalCost).toBe(16970 * 2);
   });
 
   test("categorySummary에 이미지·AI 카테고리 집계", () => {
@@ -155,13 +155,48 @@ describe("calculateQuote", () => {
       expectedScheduleDays: 1,
     };
     const result = calculateQuote(input);
-    const total = result.lineItems.find(i => i.name === "AI 이미지 생성")!.totalCost;
-    expect(total).toBe(Math.round(1 * 188040) + 1300);
+    // 배율 대상(기획/프롬프트 설계/AI 작업비) 합계는 항목별 반올림 오차(1~2원) 이내로 목표 예산과 일치하고,
+    // AI 솔루션 사용료(1,300원)만 배율과 무관하게 그대로 더해진다.
+    expect(result.costSubtotal).toBeCloseTo(1 * 188040 + 1300, -1);
   });
 
   test("선택된 항목 없이 일정만 입력해도 에러 없이 0원", () => {
     const result = calculateQuote({ ...baseInput, expectedScheduleDays: 20 });
     expect(result.costSubtotal).toBe(0);
     expect(result.totalPrice).toBe(0);
+  });
+
+  test("콘텐츠 유형 선택 시 기획 및 리서치 항목이 항상 포함됨", () => {
+    const input: QuoteInput = {
+      ...baseInput,
+      contentTypes: ["image"],
+      imageDetails: { hasSource: false, imageCount: 1, tasks: [] },
+    };
+    const result = calculateQuote(input);
+    const planning = result.lineItems.find((i) => i.name === "기획 및 리서치");
+    expect(planning).toBeDefined();
+    expect(planning!.totalCost).toBe(188040);
+  });
+
+  test("AI 콘텐츠를 선택하지 않으면 프롬프트 설계 항목은 없음", () => {
+    const input: QuoteInput = {
+      ...baseInput,
+      contentTypes: ["image"],
+      imageDetails: { hasSource: false, imageCount: 1, tasks: [] },
+    };
+    const result = calculateQuote(input);
+    expect(result.lineItems.find((i) => i.name === "프롬프트 설계")).toBeUndefined();
+  });
+
+  test("AI 콘텐츠를 선택하면 프롬프트 설계 항목이 추가됨", () => {
+    const input: QuoteInput = {
+      ...baseInput,
+      contentTypes: ["ai-image"],
+      aiImageDetails: { count: 1 },
+    };
+    const result = calculateQuote(input);
+    const prompt = result.lineItems.find((i) => i.name === "프롬프트 설계");
+    expect(prompt).toBeDefined();
+    expect(prompt!.totalCost).toBe(141030);
   });
 });

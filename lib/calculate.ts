@@ -42,6 +42,7 @@ function aiItem(
 function buildSummary(items: LineItem[]): CategorySummary[] {
   const map: Record<string, number> = {};
   const labels: Record<LineItem["category"], string> = {
+    planning: "기획",
     image: "이미지 제작",
     video: "영상·모션 제작",
     motion: "영상·모션 제작",
@@ -66,6 +67,13 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
 
   const p = input.panelInfo.count;
   const durationMin = Math.max(1, Math.ceil((input.videoDetails?.durationSeconds ?? 0) / 60));
+
+  if (input.contentTypes.length > 0) {
+    push(item("planning", RATES.planning.research, 1, false, 1));
+  }
+  if (input.contentTypes.includes("ai-image") || input.contentTypes.includes("ai-video")) {
+    push(item("planning", RATES.planning.promptDesign, 1, false, 1));
+  }
 
   if (input.contentTypes.includes("image") && input.imageDetails) {
     const img = input.imageDetails;
