@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Download, RotateCcw, FileText, Table } from "lucide-react";
-import type { QuoteInput, QuoteResult } from "@/lib/types";
+import type { QuoteInput, QuoteResult, LineItem } from "@/lib/types";
 import QuoteTable from "@/components/QuoteTable";
 import { saveQuote } from "@/lib/storage";
+import { recalcResult } from "@/lib/calculate";
+import { getCatalog, type CatalogItem } from "@/lib/catalog";
 
 interface Props {
   input: QuoteInput;
@@ -15,48 +17,12 @@ interface Props {
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
 const EXTERNAL_GROUPS = [
-  {
-    key: "planning",
-    label: "기획 및 설계",
-    icon: "🧭",
-    categories: ["planning"] as const,
-    description: () => "프로젝트 기획, 리서치 및 AI 프롬프트 설계",
-  },
-  {
-    key: "image",
-    label: "이미지 편집",
-    icon: "🖼",
-    categories: ["image"] as const,
-    description: (items: string[]) => items.length > 0 ? items.join(", ") : "이미지 소스 편집 및 합성",
-  },
-  {
-    key: "video",
-    label: "영상·모션그래픽",
-    icon: "🎬",
-    categories: ["video", "motion"] as const,
-    description: () => "컷 편집, 모션그래픽, 화면전환 및 효과",
-  },
-  {
-    key: "render",
-    label: "렌더링·인코딩",
-    icon: "💾",
-    categories: ["render"] as const,
-    description: () => "출력 렌더링 및 파일 변환",
-  },
-  {
-    key: "ai-image",
-    label: "AI 이미지 생성",
-    icon: "✨",
-    categories: ["ai-image"] as const,
-    description: () => "AI 이미지 생성 일체",
-  },
-  {
-    key: "ai-video",
-    label: "AI 영상 생성",
-    icon: "🤖",
-    categories: ["ai-video"] as const,
-    description: () => "AI 영상 생성 일체",
-  },
+  { key: "planning", label: "기획 및 설계",   icon: "🧭", categories: ["planning"] as const },
+  { key: "image",     label: "이미지 편집",    icon: "🖼", categories: ["image"] as const },
+  { key: "video",     label: "영상·모션그래픽", icon: "🎬", categories: ["video", "motion"] as const },
+  { key: "render",    label: "렌더링·인코딩",  icon: "💾", categories: ["render"] as const },
+  { key: "ai-image",  label: "AI 이미지 생성", icon: "✨", categories: ["ai-image"] as const },
+  { key: "ai-video",  label: "AI 영상 생성",   icon: "🤖", categories: ["ai-video"] as const },
 ];
 
 function ExternalQuoteView({ input, result }: { input: QuoteInput; result: QuoteResult }) {
@@ -67,11 +33,9 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
       ))
       .reduce((s, c) => s + c.amount, 0);
 
-    const itemNames = result.lineItems
-      .filter(i => (group.categories as readonly string[]).includes(i.category))
-      .map(i => i.name);
+    const items = result.lineItems.filter(i => (group.categories as readonly string[]).includes(i.category));
 
-    return { ...group, amount, itemNames };
+    return { ...group, amount, items };
   }).filter(g => g.amount > 0);
 
   return (
@@ -106,11 +70,11 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
                 <span className="text-[13px] font-black text-slate-700">{group.label}</span>
               </div>
               <div className="px-4 py-5 text-[12px] font-bold text-slate-700">
-                {group.itemNames.slice(0, 3).join(", ")}
-                {group.itemNames.length > 3 && ` 외 ${group.itemNames.length - 3}건`}
+                {group.items.slice(0, 3).map(i => i.name).join(", ")}
+                {group.items.length > 3 && ` 외 ${group.items.length - 3}건`}
               </div>
               <div className="px-4 py-5 text-[12px] text-slate-400">
-                {group.description(group.itemNames)}
+                {group.items.map(i => `${i.name}(${i.quantity})`).join(", ")}
               </div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">
                 {fmt(group.amount)}
@@ -152,6 +116,26 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
   const [tab, setTab] = useState<"internal" | "external">("internal");
   const [downloading, setDownloading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [items, setItems] = useState<LineItem[]>(result.lineItems);
+  const catalog = useMemo(() => getCatalog(), []);
+  const editableResult = useMemo(() => recalcResult(items, input.marginRate), [items, input.marginRate]);
+
+  const updateQuantity = (index: number, quantity: number) => {
+    setItems(prev => prev.map((it, i) => i === index ? { ...it, quantity, totalCost: Math.round(it.unitCost * quantity) } : it));
+  };
+  const removeItem = (index: number) => {
+    setItems(prev => prev.filter((_, i) => i !== index));
+  };
+  const addItem = (catalogItem: CatalogItem, quantity: number) => {
+    setItems(prev => [...prev, {
+      category: catalogItem.category,
+      name: catalogItem.name,
+      unit: catalogItem.unit,
+      quantity,
+      unitCost: catalogItem.unitCost,
+      totalCost: Math.round(catalogItem.unitCost * quantity),
+    }]);
+  };
 
   const handleSave = () => {
     saveQuote(input);
@@ -165,7 +149,7 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
       const res = await fetch("/api/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, result, type: tab }),
+        body: JSON.stringify({ input, result: editableResult, type: tab }),
       });
       const { base64 } = await res.json();
       const prefix = tab === "internal" ? "내부견적서" : "외부견적서";
@@ -212,10 +196,18 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
 
         {/* 카드 콘텐츠 */}
         {tab === "internal" ? (
-          <QuoteTable result={result} input={input} />
+          <QuoteTable
+            result={editableResult}
+            input={input}
+            editable
+            catalog={catalog}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeItem}
+            onAddItem={addItem}
+          />
         ) : (
           <div className="p-8">
-            <ExternalQuoteView input={input} result={result} />
+            <ExternalQuoteView input={input} result={editableResult} />
           </div>
         )}
       </div>

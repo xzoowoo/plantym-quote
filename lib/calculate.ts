@@ -39,6 +39,13 @@ function aiItem(
   };
 }
 
+export function recalcResult(lineItems: LineItem[], marginRate: number): QuoteResult {
+  const costSubtotal = lineItems.reduce((s, i) => s + i.totalCost, 0);
+  const marginAmount = Math.round(costSubtotal * marginRate / 100);
+  const totalPrice = costSubtotal + marginAmount;
+  return { lineItems, costSubtotal, marginAmount, totalPrice, categorySummary: buildSummary(lineItems) };
+}
+
 function buildSummary(items: LineItem[]): CategorySummary[] {
   const map: Record<string, number> = {};
   const labels: Record<LineItem["category"], string> = {
@@ -171,9 +178,5 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     }
   }
 
-  const costSubtotal = filteredItems.reduce((s, i) => s + i.totalCost, 0);
-  const marginAmount = Math.round(costSubtotal * input.marginRate / 100);
-  const totalPrice = costSubtotal + marginAmount;
-
-  return { lineItems: filteredItems, costSubtotal, marginAmount, totalPrice, categorySummary: buildSummary(filteredItems) };
+  return recalcResult(filteredItems, input.marginRate);
 }
