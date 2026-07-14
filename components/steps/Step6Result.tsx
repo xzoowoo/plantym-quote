@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Download, RotateCcw, FileText, Table } from "lucide-react";
 import type { QuoteInput, QuoteResult } from "@/lib/types";
 import QuoteTable from "@/components/QuoteTable";
+import { saveQuote } from "@/lib/storage";
 
 interface Props {
   input: QuoteInput;
@@ -150,6 +151,13 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
 export default function Step6Result({ input, result, onBack, onReset }: Props) {
   const [tab, setTab] = useState<"internal" | "external">("internal");
   const [downloading, setDownloading] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    saveQuote(input);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   const downloadPDF = async () => {
     setDownloading(true);
@@ -218,6 +226,12 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
           ← 마진 수정하기
         </button>
         <div className="flex space-x-3">
+          <button
+            onClick={handleSave}
+            className="flex items-center space-x-2 px-5 py-2.5 border-2 border-slate-200 bg-white text-slate-700 rounded-xl text-sm font-bold hover:border-primary hover:text-primary transition-all"
+          >
+            <span>{saved ? "저장했어요 ✓" : "견적 저장"}</span>
+          </button>
           <button
             onClick={downloadPDF}
             disabled={downloading}

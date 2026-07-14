@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Info, ShieldCheck } from "lucide-react";
 import WizardNav from "@/components/WizardNav";
 import Step1BasicInfo from "@/components/steps/Step1BasicInfo";
@@ -9,6 +9,7 @@ import Step4Details from "@/components/steps/Step4Details";
 import Step5Margin from "@/components/steps/Step5Margin";
 import Step6Result from "@/components/steps/Step6Result";
 import { calculateQuote } from "@/lib/calculate";
+import { consumePendingLoad } from "@/lib/storage";
 import type { QuoteInput, QuoteResult } from "@/lib/types";
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
@@ -49,6 +50,15 @@ export default function Page() {
   const [input, setInput] = useState<QuoteInput>(INITIAL_INPUT);
   const [result, setResult] = useState<QuoteResult | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    const pending = consumePendingLoad();
+    if (pending) {
+      setInput(pending);
+      setResult(calculateQuote(pending));
+      setStep(6);
+    }
+  }, []);
 
   const handleNext = () => {
     if (step === 5) {
