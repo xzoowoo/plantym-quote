@@ -59,7 +59,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
       <div className="border border-slate-100 rounded-2xl overflow-x-auto">
         <div className="min-w-[500px]">
           <div className="grid grid-cols-[160px_1fr_1fr_150px] bg-slate-50 border-b border-slate-100">
-            {["구분", "세부 항목", "산출 근거 (비고)", "예상 금액"].map(h => (
+            {["구분", "세부 항목", "수량", "예상 금액"].map(h => (
               <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
             ))}
           </div>
@@ -74,7 +74,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
                 {group.items.length > 3 && ` 외 ${group.items.length - 3}건`}
               </div>
               <div className="px-4 py-5 text-[12px] text-slate-400">
-                {group.items.map(i => `${i.name}(${i.quantity})`).join(", ")}
+                1
               </div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">
                 {fmt(group.amount)}
@@ -85,7 +85,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
             <div className="grid grid-cols-[160px_1fr_1fr_150px] border-b border-slate-50 bg-white">
               <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
               <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
-              <div className="px-4 py-5 text-[12px] text-slate-400">프로젝트 관리 및 제경비</div>
+              <div className="px-4 py-5 text-[12px] text-slate-400">1</div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">{fmt(result.marginAmount)}</div>
             </div>
           )}
