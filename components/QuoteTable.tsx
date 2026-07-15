@@ -22,6 +22,9 @@ function AddItemRow({ catalog, onAdd }: { catalog: CatalogItem[]; onAdd: (c: Cat
 
   if (catalog.length === 0) return null;
 
+  const selected = catalog[selectedIdx];
+  const isAI = selected.category === "ai-image" || selected.category === "ai-video";
+
   return (
     <div className="px-6 py-4 border-t border-slate-100 flex items-center gap-3">
       <select
@@ -38,12 +41,14 @@ function AddItemRow({ catalog, onAdd }: { catalog: CatalogItem[]; onAdd: (c: Cat
       <input
         type="number"
         min={1}
-        value={qty}
+        value={isAI ? 1 : qty}
+        disabled={isAI}
+        title={isAI ? "AI 항목은 1건 고정으로만 추가할 수 있습니다." : undefined}
         onChange={e => setQty(Math.max(1, Number(e.target.value)))}
-        className="w-20 text-center bg-slate-50 border-2 border-slate-50 rounded-xl py-2.5 outline-none focus:border-primary/30 focus:bg-white transition-all font-bold text-[13px]"
+        className="w-20 text-center bg-slate-50 border-2 border-slate-50 rounded-xl py-2.5 outline-none focus:border-primary/30 focus:bg-white transition-all font-bold text-[13px] disabled:text-slate-400 disabled:cursor-not-allowed"
       />
       <button
-        onClick={() => { onAdd(catalog[selectedIdx], qty); setQty(1); }}
+        onClick={() => { onAdd(selected, isAI ? 1 : qty); setQty(1); }}
         className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-[13px] font-bold hover:bg-blue-700 transition-all shrink-0"
       >
         <Plus size={14} />
@@ -114,7 +119,14 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
                     <td className="px-6 py-4 pl-8 text-[13px] font-medium text-slate-800">{lineItem.name}</td>
                     <td className="px-4 py-4 text-[12px] text-slate-400 text-center">{lineItem.unit}</td>
                     <td className="px-4 py-4 text-[13px] font-bold text-slate-800 text-center">
-                      {editable ? (
+                      {editable && (category === "ai-image" || category === "ai-video") ? (
+                        <span
+                          className="inline-block w-14 text-center bg-slate-100 rounded-lg py-1 text-slate-400 cursor-not-allowed"
+                          title="AI 항목 수량은 4단계(정보 입력)에서 조정해주세요. 다른 항목들과의 비율 재계산을 위해서입니다."
+                        >
+                          {lineItem.quantity}
+                        </span>
+                      ) : editable ? (
                         <input
                           type="number"
                           min={0}
@@ -173,6 +185,9 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
         </span>
         {input?.expectedScheduleDays ? (
           <span className="block mt-1">본 견적은 예상 제작일정 {input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.</span>
+        ) : null}
+        {editable ? (
+          <span className="block mt-1">AI 이미지·영상 생성 수량은 이 화면에서 변경할 수 없습니다. 다른 항목과의 비율 재계산이 필요해 4단계(정보 입력)에서 조정해주세요.</span>
         ) : null}
       </div>
     </div>
