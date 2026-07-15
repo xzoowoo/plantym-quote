@@ -83,8 +83,8 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
           ))}
           {result.marginAmount > 0 && (
             <div className="grid grid-cols-[160px_1fr_1fr_150px] border-b border-slate-50 bg-white">
-              <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
-              <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타 (프로젝트 관리 및 제경비)</div>
+              <div className="px-4 py-5 text-[13px] font-black text-slate-700">기타</div>
+              <div className="px-4 py-5 text-[12px] font-bold text-slate-700">프로젝트 관리 및 제경비</div>
               <div className="px-4 py-5 text-[12px] text-slate-400 text-center">1</div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">{fmt(result.marginAmount)}</div>
             </div>
