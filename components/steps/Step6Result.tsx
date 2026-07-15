@@ -60,7 +60,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
         <div className="min-w-[500px]">
           <div className="grid grid-cols-[160px_1fr_1fr_150px] bg-slate-50 border-b border-slate-100">
             {["구분", "세부 항목", "수량", "예상 금액"].map(h => (
-              <div key={h} className="px-4 py-4 text-[11px] font-black text-slate-400 uppercase">{h}</div>
+              <div key={h} className={`px-4 py-4 text-[11px] font-black text-slate-400 uppercase ${h === "수량" ? "text-center" : ""}`}>{h}</div>
             ))}
           </div>
           {grouped.map((group, i) => (
@@ -73,7 +73,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
                 {group.items.slice(0, 3).map(i => i.name).join(", ")}
                 {group.items.length > 3 && ` 외 ${group.items.length - 3}건`}
               </div>
-              <div className="px-4 py-5 text-[12px] text-slate-400">
+              <div className="px-4 py-5 text-[12px] text-slate-400 text-center">
                 1
               </div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">
@@ -85,7 +85,7 @@ function ExternalQuoteView({ input, result }: { input: QuoteInput; result: Quote
             <div className="grid grid-cols-[160px_1fr_1fr_150px] border-b border-slate-50 bg-white">
               <div className="px-4 py-5 text-[13px] font-black text-slate-500">···</div>
               <div className="px-4 py-5 text-[12px] font-bold text-slate-700">기타</div>
-              <div className="px-4 py-5 text-[12px] text-slate-400">1</div>
+              <div className="px-4 py-5 text-[12px] text-slate-400 text-center">1</div>
               <div className="px-4 py-5 text-[13px] font-black text-slate-900 font-mono whitespace-nowrap">{fmt(result.marginAmount)}</div>
             </div>
           )}
