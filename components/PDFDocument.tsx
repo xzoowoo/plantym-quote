@@ -16,6 +16,7 @@ const s = StyleSheet.create({
   row: { flexDirection: "row", borderBottom: "1pt solid #e5e7eb", paddingVertical: 5 },
   headerRow: { flexDirection: "row", backgroundColor: "#f3f4f6", paddingVertical: 6, marginBottom: 2 },
   col1: { flex: 3 },
+  colQty: { width: 50, textAlign: "center" },
   col2: { width: 90, textAlign: "right" },
   totalRow: { flexDirection: "row", paddingVertical: 8, borderTop: "2pt solid #1a56db", marginTop: 4 },
   totalLabel: { flex: 3, fontSize: 12, fontWeight: "bold", color: "#1a56db" },
@@ -54,17 +55,20 @@ export function PDFDocument({ input, result }: { input: QuoteInput; result: Quot
           <Text style={s.sectionTitle}>작업 내역</Text>
           <View style={s.headerRow}>
             <Text style={s.col1}>구분</Text>
+            <Text style={s.colQty}>수량</Text>
             <Text style={s.col2}>금액</Text>
           </View>
           {result.categorySummary.map((cat) => (
             <View key={cat.label} style={s.row}>
               <Text style={s.col1}>{cat.label}</Text>
+              <Text style={s.colQty}>1</Text>
               <Text style={s.col2}>{cat.amount.toLocaleString()}원</Text>
             </View>
           ))}
           {result.marginAmount > 0 && (
             <View style={s.row}>
               <Text style={s.col1}>기타 (프로젝트 관리 및 제경비)</Text>
+              <Text style={s.colQty}>1</Text>
               <Text style={s.col2}>{result.marginAmount.toLocaleString()}원</Text>
             </View>
           )}
@@ -72,6 +76,7 @@ export function PDFDocument({ input, result }: { input: QuoteInput; result: Quot
 
         <View style={s.totalRow}>
           <Text style={s.totalLabel}>합계 (VAT 별도)</Text>
+          <Text style={s.colQty} />
           <Text style={s.totalValue}>{result.totalPrice.toLocaleString()}원</Text>
         </View>
 
