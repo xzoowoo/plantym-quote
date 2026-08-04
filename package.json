@@ -18,7 +18,11 @@
     ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
-    }
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/.claude/worktrees/"
+    ]
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
