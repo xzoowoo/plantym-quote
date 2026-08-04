@@ -5,6 +5,7 @@ import type { QuoteInput, QuoteResult, LineItem } from "@/lib/types";
 import QuoteTable from "@/components/QuoteTable";
 import { saveQuote } from "@/lib/storage";
 import { recalcResult } from "@/lib/calculate";
+import { costFromMinutes } from "@/lib/rates";
 import { getCatalog, type CatalogItem } from "@/lib/catalog";
 
 interface Props {
@@ -123,6 +124,22 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
   const updateQuantity = (index: number, quantity: number) => {
     setItems(prev => prev.map((it, i) => i === index ? { ...it, quantity, totalCost: Math.round(it.unitCost * quantity) } : it));
   };
+  const updateMinutes = (index: number, minutes: number) => {
+    setItems(prev => prev.map((it, i) => {
+      if (i !== index || it.difficultyWeight === undefined) return it;
+      const unitCost = costFromMinutes(minutes, it.difficultyWeight);
+      return { ...it, minutes, unitCost, totalCost: Math.round(unitCost * it.quantity) };
+    }));
+  };
+  const updateAttemptCount = (index: number, groupIndex: number, count: number) => {
+    setItems(prev => prev.map((it, i) => {
+      if (i !== index || !it.attemptGroups) return it;
+      const attemptGroups = it.attemptGroups.map((g, gi) => gi === groupIndex ? { ...g, count } : g);
+      const usageFee = attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
+      const unitCost = (it.laborCost ?? 0) + usageFee;
+      return { ...it, attemptGroups, unitCost, totalCost: Math.round(unitCost * it.quantity) };
+    }));
+  };
   const removeItem = (index: number) => {
     setItems(prev => prev.filter((_, i) => i !== index));
   };
@@ -134,6 +151,10 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
       quantity,
       unitCost: catalogItem.unitCost,
       totalCost: Math.round(catalogItem.unitCost * quantity),
+      minutes: catalogItem.minutes,
+      difficultyWeight: catalogItem.difficultyWeight,
+      laborCost: catalogItem.laborCost,
+      attemptGroups: catalogItem.attemptGroups,
     }]);
   };
 
@@ -202,6 +223,8 @@ export default function Step6Result({ input, result, onBack, onReset }: Props) {
             editable
             catalog={catalog}
             onUpdateQuantity={updateQuantity}
+            onUpdateMinutes={updateMinutes}
+            onUpdateAttemptCount={updateAttemptCount}
             onRemoveItem={removeItem}
             onAddItem={addItem}
           />
