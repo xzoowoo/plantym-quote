@@ -38,9 +38,9 @@ describe("AI_RATES", () => {
     const usageFee = AI_RATES.image.attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
     expect(AI_RATES.image.laborCost + usageFee).toBe(16970);
   });
-  test("AI 영상: 참고이미지 240건×130원 + 영상 480건×2,170원 = 1,072,800원 사용료", () => {
+  test("AI 영상: 영상 생성 480건×2,170원 = 1,041,600원 사용료 (참고이미지 생성 비용은 AI 이미지 항목과 중복이라 제외)", () => {
     const usageFee = AI_RATES.video.attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
-    expect(usageFee).toBe(1072800);
-    expect(AI_RATES.video.laborCost + usageFee).toBe(5773800);
+    expect(usageFee).toBe(1041600);
+    expect(AI_RATES.video.laborCost + usageFee).toBe(5742600);
   });
 });

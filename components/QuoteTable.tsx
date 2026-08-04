@@ -15,7 +15,6 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 };
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
-const diffLabel = (w?: number) => (w === 2 ? "상 ×2.0" : w === 1.5 ? "중 ×1.5" : w === 1 ? "하 ×1.0" : "");
 
 function AddItemRow({ catalog, onAdd }: { catalog: CatalogItem[]; onAdd: (c: CatalogItem, qty: number) => void }) {
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -144,7 +143,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
                     </td>
                     <td className="px-4 py-4 text-center">
                       {lineItem.minutes !== undefined && lineItem.difficultyWeight !== undefined ? (
-                        <div className="flex flex-col items-center gap-0.5">
+                        <div className="flex items-center justify-center gap-1">
                           {editable ? (
                             <input
                               type="number"
@@ -154,27 +153,29 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
                               className="w-16 text-center bg-slate-50 rounded-lg py-1 outline-none focus:ring-2 focus:ring-primary/30 font-bold text-slate-800"
                             />
                           ) : (
-                            <span className="text-[12px] font-bold text-slate-800">{lineItem.minutes}분</span>
+                            <span className="text-[12px] font-bold text-slate-800">{lineItem.minutes}</span>
                           )}
-                          <span className="text-[10px] text-slate-400">{diffLabel(lineItem.difficultyWeight)}</span>
+                          <span className="text-[11px] text-slate-400">분</span>
                         </div>
                       ) : lineItem.attemptGroups ? (
-                        <div className="space-y-1">
+                        <div className="space-y-1.5">
                           {lineItem.attemptGroups.map((g, gi) => (
-                            <div key={gi} className="flex items-center justify-center gap-1">
+                            <div key={gi} className="flex flex-col items-center gap-0.5">
+                              <div className="flex items-center justify-center gap-1">
+                                {editable ? (
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    value={g.count}
+                                    onChange={e => onUpdateAttemptCount?.(index, gi, Math.max(0, Number(e.target.value)))}
+                                    className="w-14 text-center bg-slate-50 rounded-lg py-1 outline-none focus:ring-2 focus:ring-primary/30 font-bold text-slate-800"
+                                  />
+                                ) : (
+                                  <span className="text-[12px] font-bold text-slate-800">{g.count}</span>
+                                )}
+                                <span className="text-[11px] text-slate-400">건</span>
+                              </div>
                               <span className="text-[10px] text-slate-400">{g.label}</span>
-                              {editable ? (
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={g.count}
-                                  onChange={e => onUpdateAttemptCount?.(index, gi, Math.max(0, Number(e.target.value)))}
-                                  className="w-12 text-center bg-slate-50 rounded-lg py-0.5 outline-none focus:ring-2 focus:ring-primary/30 font-bold text-slate-800 text-[12px]"
-                                />
-                              ) : (
-                                <span className="text-[12px] font-bold text-slate-800">{g.count}</span>
-                              )}
-                              <span className="text-[10px] text-slate-400">건</span>
                             </div>
                           ))}
                         </div>

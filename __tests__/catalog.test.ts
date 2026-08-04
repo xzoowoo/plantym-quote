@@ -4,7 +4,7 @@ describe("getCatalog", () => {
   test("AI 이미지 항목은 laborCost와 attemptGroups를 포함", () => {
     const aiImage = getCatalog().find(c => c.category === "ai-image");
     expect(aiImage?.laborCost).toBe(15670);
-    expect(aiImage?.attemptGroups?.[0]).toEqual({ label: "이미지 생성 시도", count: 10, costPerAttempt: 130 });
+    expect(aiImage?.attemptGroups?.[0]).toEqual({ label: "이미지 생성 횟수", count: 10, costPerAttempt: 130 });
     expect(aiImage?.unitCost).toBe(16970);
   });
 
