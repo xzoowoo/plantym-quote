@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ReceiptText, LayoutDashboard, Quote, Users, Settings } from "lucide-react";
+import { ReceiptText, LayoutDashboard, Quote, BookOpen, Users, Settings } from "lucide-react";
 
 const NavItem = ({ icon, label, href, active, disabled }: {
   icon: React.ReactNode; label: string; href: string; active?: boolean; disabled?: boolean;
@@ -37,6 +37,7 @@ export default function Sidebar() {
       <nav className="flex-1 space-y-1">
         <NavItem icon={<LayoutDashboard size={18} />} label="견적 작성" href="/" active={pathname === "/"} />
         <NavItem icon={<Quote size={18} />} label="견적 내역" href="/quotes" active={pathname === "/quotes"} />
+        <NavItem icon={<BookOpen size={18} />} label="단가 산출 기준" href="/pricing-guide" active={pathname === "/pricing-guide"} />
         <NavItem icon={<Users size={18} />} label="업체 관리" href="#" disabled />
         <NavItem icon={<Settings size={18} />} label="설정" href="#" disabled />
       </nav>
