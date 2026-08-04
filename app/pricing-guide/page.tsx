@@ -98,8 +98,9 @@ function AIBreakdownTable({ breakdown, attemptLabel, attemptCount, costPerAttemp
           <td className="py-2.5 text-right font-mono font-bold text-slate-900 text-[13px] whitespace-nowrap">{fmt(laborCost)}</td>
         </tr>
         <tr className="border-b border-slate-100">
-          <td colSpan={3} className="py-2.5 text-right text-[12px] text-slate-500 font-medium">
-            AI 솔루션 사용료 (예: {attemptLabel} {attemptCount}건 × {fmt(costPerAttempt)})
+          <td colSpan={3} className="py-2.5 text-left">
+            <div className="text-[13px] font-medium text-slate-800">AI 솔루션 사용료</div>
+            <div className="text-[11px] text-slate-400 mt-0.5">예: {attemptLabel} {attemptCount}건 × {fmt(costPerAttempt)}</div>
           </td>
           <td className="py-2.5 text-right font-mono font-bold text-slate-900 text-[13px] whitespace-nowrap">{fmt(usageFee)}</td>
         </tr>
