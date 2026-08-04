@@ -15,9 +15,9 @@ describe("RATES 기본값 갱신 (2026-08-04 단가표 기준)", () => {
     expect(RATES.image.resize.difficultyWeight).toBe(1.0);
     expect(RATES.image.resize.cost).toBe(1959);
   });
-  test("소스 분리: 180분(중) = 105,773원", () => {
-    expect(RATES.image.separate.minutes).toBe(180);
-    expect(RATES.image.separate.cost).toBe(105773);
+  test("소스 분리: 1장당 36분(중) = 21,155원 (엑셀의 '5장에 180분'을 1장 기준으로 환산)", () => {
+    expect(RATES.image.separate.minutes).toBe(36);
+    expect(RATES.image.separate.cost).toBe(21155);
   });
   test("화면전환 기본: 5분(하) = 1,959원", () => {
     expect(RATES.motion.transitionBasic.minutes).toBe(5);

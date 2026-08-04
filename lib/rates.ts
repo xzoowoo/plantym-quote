@@ -34,7 +34,8 @@ export const RATES = {
     research:      { name: "소스 리서치",        unit: "1건", ...c(60, "low") },
     resize:        { name: "사이즈 변경",         unit: "1장", ...c(5,  "low") },
     removeBg:      { name: "배경 제거(누끼)",     unit: "1장", ...c(20, "mid") },
-    separate:      { name: "소스 분리",           unit: "1장", ...c(180,"mid") },
+    // 단가표/영상 제작 견적서_260804.xlsx는 "5장에 180분(총량)"으로 적혀 있었음 — 1장당 36분(180÷5)이 맞음
+    separate:      { name: "소스 분리",           unit: "1장", ...c(36, "mid") },
     reposition:    { name: "소스 재배치",         unit: "1장", ...c(30, "mid") },
     composite:     { name: "합성",               unit: "1장", ...c(10, "mid") },
     text:          { name: "텍스트 추가",         unit: "1장", ...c(10, "mid") },
