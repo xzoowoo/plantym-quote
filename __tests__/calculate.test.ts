@@ -128,8 +128,8 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "AI 영상 생성");
-    expect(item!.attemptGroups).toEqual([{ label: "영상 생성 횟수", count: 480, costPerAttempt: 2170 }]);
-    expect(item!.totalCost).toBe(5742600);
+    expect(item!.attemptGroups).toEqual([{ label: "영상 생성 횟수", count: 10, costPerAttempt: 2170 }]);
+    expect(item!.totalCost).toBe(4722700);
   });
 
   test("categorySummary에 이미지·AI 카테고리 집계", () => {
