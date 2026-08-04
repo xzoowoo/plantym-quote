@@ -155,7 +155,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
                           ) : (
                             <span className="text-[12px] font-bold text-slate-800">{lineItem.minutes}</span>
                           )}
-                          <span className="text-[11px] text-slate-400">분</span>
+                          <span className="text-[11px] text-slate-400">분(건당)</span>
                         </div>
                       ) : lineItem.attemptGroups ? (
                         <div className="space-y-1.5">

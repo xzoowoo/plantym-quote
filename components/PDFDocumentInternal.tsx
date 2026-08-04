@@ -20,7 +20,7 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
 const timeOrAttempts = (li: LineItem): string => {
-  if (li.minutes !== undefined) return `${li.minutes}분`;
+  if (li.minutes !== undefined) return `${li.minutes}분(건당)`;
   if (li.attemptGroups) return li.attemptGroups.map(g => `${g.label} ${g.count}건`).join("\n");
   return "-";
 };
