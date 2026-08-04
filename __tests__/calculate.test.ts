@@ -198,7 +198,7 @@ describe("calculateQuote", () => {
       imageDetails: { hasSource: false, imageCount: 1, tasks: [] },
     };
     const result = calculateQuote(input);
-    expect(result.lineItems.find((i) => i.name === "프롬프트 설계")).toBeUndefined();
+    expect(result.lineItems.find((i) => i.name === "기획 및 프롬프트 설계")).toBeUndefined();
   });
 
   test("AI 콘텐츠를 선택하면 프롬프트 설계 항목이 여전히 자동으로 추가됨", () => {
@@ -208,7 +208,7 @@ describe("calculateQuote", () => {
       aiImageDetails: { count: 1 },
     };
     const result = calculateQuote(input);
-    const prompt = result.lineItems.find((i) => i.name === "프롬프트 설계");
+    const prompt = result.lineItems.find((i) => i.name === "기획 및 프롬프트 설계");
     expect(prompt).toBeDefined();
     expect(prompt!.totalCost).toBe(141030);
   });

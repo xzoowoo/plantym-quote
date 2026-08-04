@@ -71,7 +71,7 @@ export const RATES = {
     // 기획 및 리서치: 480분(하) — 이제 모든 견적에 자동 포함되지 않으며, 6단계 "항목 추가"에서 수동으로 추가한다.
     research:     { name: "기획 및 리서치", unit: "1식", ...c(480, "low") },
     // 프롬프트 설계: 240분(중) — AI 이미지/영상 생성을 선택했을 때만 지금처럼 자동 포함된다.
-    promptDesign: { name: "프롬프트 설계", unit: "1식", ...c(240, "mid") },
+    promptDesign: { name: "기획 및 프롬프트 설계", unit: "1식", ...c(240, "mid") },
   },
 } as const;
 

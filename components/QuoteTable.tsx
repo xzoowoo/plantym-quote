@@ -204,19 +204,19 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
         </tbody>
         <tfoot>
           <tr className="border-t border-slate-100">
-            <td colSpan={4} className="px-6 py-5 text-right text-[13px] text-slate-500 font-medium">원가 소계</td>
+            <td colSpan={5} className="px-6 py-5 text-right text-[13px] text-slate-500 font-medium">원가 소계</td>
             <td className="px-4 py-5 text-right font-mono font-black text-slate-900 text-[15px] pr-6 whitespace-nowrap">{fmt(result.costSubtotal)}</td>
             {editable && <td />}
           </tr>
           {result.marginAmount > 0 && (
             <tr>
-              <td colSpan={4} className="px-6 py-3 text-right text-[13px] text-primary font-medium">마진 ({marginRate}%)</td>
+              <td colSpan={5} className="px-6 py-3 text-right text-[13px] text-primary font-medium">마진 ({marginRate}%)</td>
               <td className="px-4 py-3 text-right font-mono font-bold text-primary text-[14px] pr-6 whitespace-nowrap">+ {fmt(result.marginAmount)}</td>
               {editable && <td />}
             </tr>
           )}
           <tr className="bg-primary/5">
-            <td colSpan={4} className="px-6 py-5 text-right font-black text-slate-900 text-[14px]">최종 견적가 (VAT 별도)</td>
+            <td colSpan={5} className="px-6 py-5 text-right font-black text-slate-900 text-[14px]">최종 견적가 (VAT 별도)</td>
             <td className="px-4 py-5 text-right font-mono font-black text-primary text-[15px] pr-6 whitespace-nowrap">{fmt(result.totalPrice)}</td>
             {editable && <td />}
           </tr>
