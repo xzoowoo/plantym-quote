@@ -55,7 +55,7 @@ export default function Step5Margin({ marginRate, onChange, expectedScheduleDays
             />
             <span className="text-sm text-slate-400 font-medium">일</span>
           </div>
-          <p className="text-[12px] text-slate-400 mt-2">입력하지 않으면 항목별 기본 단가로 자동 계산됩니다. 입력하면 선택한 항목들의 비율은 유지한 채 전체 금액이 이 일정에 맞춰 재조정됩니다.</p>
+          <p className="text-[12px] text-slate-400 mt-2">참고용으로만 기재되며, 항목별 금액에는 영향을 주지 않습니다.</p>
         </div>
 
         {previewSubtotal > 0 && (
