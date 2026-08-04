@@ -15,6 +15,7 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 };
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
+const diffLabel = (w?: number) => (w === 2 ? "상 ×2.0" : w === 1.5 ? "중 ×1.5" : w === 1 ? "하 ×1.0" : "");
 
 function AddItemRow({ catalog, onAdd }: { catalog: CatalogItem[]; onAdd: (c: CatalogItem, qty: number) => void }) {
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -64,11 +65,13 @@ interface Props {
   editable?: boolean;
   catalog?: CatalogItem[];
   onUpdateQuantity?: (index: number, quantity: number) => void;
+  onUpdateMinutes?: (index: number, minutes: number) => void;
+  onUpdateAttemptCount?: (index: number, groupIndex: number, count: number) => void;
   onRemoveItem?: (index: number) => void;
   onAddItem?: (catalogItem: CatalogItem, quantity: number) => void;
 }
 
-export default function QuoteTable({ result, input, editable, catalog, onUpdateQuantity, onRemoveItem, onAddItem }: Props) {
+export default function QuoteTable({ result, input, editable, catalog, onUpdateQuantity, onUpdateMinutes, onUpdateAttemptCount, onRemoveItem, onAddItem }: Props) {
   const grouped: { category: LineItem["category"]; items: { item: LineItem; index: number }[] }[] = [];
   result.lineItems.forEach((lineItem, index) => {
     const group = grouped.find(g => g.category === lineItem.category);
@@ -83,7 +86,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
   const marginRate = result.costSubtotal > 0
     ? Math.round(result.marginAmount / result.costSubtotal * 100)
     : 0;
-  const colCount = editable ? 6 : 5;
+  const colCount = editable ? 7 : 6;
 
   return (
     <div className="overflow-x-auto">
@@ -93,6 +96,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
             <th className="px-6 py-4 text-[11px] font-bold text-slate-400">작업 항목</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[80px]">기준</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[70px]">수량</th>
+            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[150px]">소요시간/건수</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[130px]">단가</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[150px] pr-6">합계</th>
             {editable && <th className="w-[48px]" />}
@@ -136,6 +140,46 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
                         />
                       ) : (
                         lineItem.quantity
+                      )}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      {lineItem.minutes !== undefined && lineItem.difficultyWeight !== undefined ? (
+                        <div className="flex flex-col items-center gap-0.5">
+                          {editable ? (
+                            <input
+                              type="number"
+                              min={0}
+                              value={lineItem.minutes}
+                              onChange={e => onUpdateMinutes?.(index, Math.max(0, Number(e.target.value)))}
+                              className="w-16 text-center bg-slate-50 rounded-lg py-1 outline-none focus:ring-2 focus:ring-primary/30 font-bold text-slate-800"
+                            />
+                          ) : (
+                            <span className="text-[12px] font-bold text-slate-800">{lineItem.minutes}분</span>
+                          )}
+                          <span className="text-[10px] text-slate-400">{diffLabel(lineItem.difficultyWeight)}</span>
+                        </div>
+                      ) : lineItem.attemptGroups ? (
+                        <div className="space-y-1">
+                          {lineItem.attemptGroups.map((g, gi) => (
+                            <div key={gi} className="flex items-center justify-center gap-1">
+                              <span className="text-[10px] text-slate-400">{g.label}</span>
+                              {editable ? (
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={g.count}
+                                  onChange={e => onUpdateAttemptCount?.(index, gi, Math.max(0, Number(e.target.value)))}
+                                  className="w-12 text-center bg-slate-50 rounded-lg py-0.5 outline-none focus:ring-2 focus:ring-primary/30 font-bold text-slate-800 text-[12px]"
+                                />
+                              ) : (
+                                <span className="text-[12px] font-bold text-slate-800">{g.count}</span>
+                              )}
+                              <span className="text-[10px] text-slate-400">건</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-slate-300">-</span>
                       )}
                     </td>
                     <td className="px-4 py-4 text-[12px] text-slate-400 text-right font-mono whitespace-nowrap">{fmt(lineItem.unitCost)}</td>
@@ -184,7 +228,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
           AI 생성비 산출 근거: 작업비(기획·리서치, 프롬프트 설계, 생성·선별, 후보정·합성)는 위와 동일한 기준 단가·난이도로 산정 · AI 솔루션 사용료는 Midjourney Mega Plan · Gemini Ultra Plan 기준, 이미지 생성 130원/건 · 영상 생성 2,170원/건(환율 1,550원/USD, 2026-07-01 기준)
         </span>
         {input?.expectedScheduleDays ? (
-          <span className="block mt-1">본 견적은 예상 제작일정 {input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.</span>
+          <span className="block mt-1">예상 제작일정 {input.expectedScheduleDays}일은 참고용으로 기재된 값이며, 항목별 금액에는 반영되지 않았습니다.</span>
         ) : null}
         {editable ? (
           <span className="block mt-1">AI 이미지·영상 생성 수량은 이 화면에서 변경할 수 없습니다. 다른 항목과의 비율 재계산이 필요해 4단계(정보 입력)에서 조정해주세요.</span>
