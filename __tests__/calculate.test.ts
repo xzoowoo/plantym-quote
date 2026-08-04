@@ -77,7 +77,7 @@ describe("calculateQuote", () => {
     expect(item!.totalCost).toBe(11753);
   });
 
-  test("사이즈 변경 4장 → 392 × 4 (1장 단가)", () => {
+  test("사이즈 변경 4장 → 1,959 × 4 (1장 단가, 2026-08-04 단가표 기준 5분)", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["image"],
@@ -85,7 +85,9 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "사이즈 변경");
-    expect(item!.totalCost).toBe(392 * 4);
+    expect(item!.totalCost).toBe(1959 * 4);
+    expect(item!.minutes).toBe(5);
+    expect(item!.difficultyWeight).toBe(1.0);
   });
 
   test("등장효과 기본 3건 → 3,918 × 3", () => {
@@ -105,7 +107,7 @@ describe("calculateQuote", () => {
     expect(item!.totalCost).toBe(3918 * 3);
   });
 
-  test("AI 이미지 2건 → 16,970 × 2", () => {
+  test("AI 이미지 2건 → 16,970 × 2, laborCost/attemptGroups 포함", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["ai-image"],
@@ -114,6 +116,20 @@ describe("calculateQuote", () => {
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "AI 이미지 생성");
     expect(item!.totalCost).toBe(16970 * 2);
+    expect(item!.laborCost).toBe(15670);
+    expect(item!.attemptGroups).toEqual([{ label: "이미지 생성 시도", count: 10, costPerAttempt: 130 }]);
+  });
+
+  test("AI 영상 항목은 참고이미지·영상 생성 시도 두 그룹을 모두 가짐", () => {
+    const input: QuoteInput = {
+      ...baseInput,
+      contentTypes: ["ai-video"],
+      aiVideoDetails: { count: 1 },
+    };
+    const result = calculateQuote(input);
+    const item = result.lineItems.find((i) => i.name === "AI 영상 생성");
+    expect(item!.attemptGroups).toHaveLength(2);
+    expect(item!.attemptGroups!.map(g => g.label)).toEqual(["참고이미지 생성 시도", "영상 생성 시도"]);
   });
 
   test("categorySummary에 이미지·AI 카테고리 집계", () => {
@@ -129,46 +145,33 @@ describe("calculateQuote", () => {
     expect(labels).toContain("AI 이미지 생성");
   });
 
-  test("일정 미입력 시 기존 계산과 동일", () => {
+  test("예상 제작일정을 입력해도 costSubtotal이 변하지 않음 (재조정 로직 삭제 회귀 확인)", () => {
     const input: QuoteInput = {
-      ...baseInput,
-      contentTypes: ["image"],
-      imageDetails: { hasSource: false, imageCount: 1, tasks: [] },
-    };
-    const withoutSchedule = calculateQuote(input);
-    const withZeroSchedule = calculateQuote({ ...input, expectedScheduleDays: 0 });
-    expect(withZeroSchedule.costSubtotal).toBe(withoutSchedule.costSubtotal);
-  });
-
-  test("예상 제작일정 입력 시 항목 비율 유지하며 총액이 일정에 맞춰짐", () => {
-    const base: QuoteInput = {
       ...baseInput,
       contentTypes: ["image"],
       imageDetails: { hasSource: false, imageCount: 1, tasks: ["remove-bg"] },
     };
-    const baseResult = calculateQuote(base);
-    const result = calculateQuote({ ...base, expectedScheduleDays: 10 });
-
-    const researchBase = baseResult.lineItems.find(i => i.name === "소스 리서치")!.totalCost;
-    const removeBgBase = baseResult.lineItems.find(i => i.name === "배경 제거(누끼)")!.totalCost;
-    const research = result.lineItems.find(i => i.name === "소스 리서치")!.totalCost;
-    const removeBg = result.lineItems.find(i => i.name === "배경 제거(누끼)")!.totalCost;
-
-    expect(research / removeBg).toBeCloseTo(researchBase / removeBgBase, 2);
-    expect(result.costSubtotal).toBeCloseTo(10 * 188040, -2);
+    const withoutSchedule = calculateQuote(input);
+    const with10Days = calculateQuote({ ...input, expectedScheduleDays: 10 });
+    const with1Day = calculateQuote({ ...input, expectedScheduleDays: 1 });
+    expect(with10Days.costSubtotal).toBe(withoutSchedule.costSubtotal);
+    expect(with1Day.costSubtotal).toBe(withoutSchedule.costSubtotal);
   });
 
-  test("AI 이미지 포함 시 AI 솔루션 사용료는 일정과 무관하게 고정", () => {
-    const input: QuoteInput = {
+  test("같은 항목(배경 제거)은 이미지만 있는 견적과 이미지+영상이 함께 있는 견적에서 금액이 동일함", () => {
+    const imageOnly: QuoteInput = {
       ...baseInput,
-      contentTypes: ["ai-image"],
-      aiImageDetails: { count: 1 },
-      expectedScheduleDays: 1,
+      contentTypes: ["image"],
+      imageDetails: { hasSource: true, imageCount: 3, tasks: ["remove-bg"] },
     };
-    const result = calculateQuote(input);
-    // 배율 대상(기획/프롬프트 설계/AI 작업비) 합계는 항목별 반올림 오차(1~2원) 이내로 목표 예산과 일치하고,
-    // AI 솔루션 사용료(1,300원)만 배율과 무관하게 그대로 더해진다.
-    expect(result.costSubtotal).toBeCloseTo(1 * 188040 + 1300, -1);
+    const imageAndVideo: QuoteInput = {
+      ...imageOnly,
+      contentTypes: ["image", "video"],
+      videoDetails: { ...baseInput.videoDetails, durationSeconds: 120, cutEdit: true, subtitle: true },
+    };
+    const a = calculateQuote(imageOnly).lineItems.find(i => i.name === "배경 제거(누끼)")!.totalCost;
+    const b = calculateQuote(imageAndVideo).lineItems.find(i => i.name === "배경 제거(누끼)")!.totalCost;
+    expect(a).toBe(b);
   });
 
   test("선택된 항목 없이 일정만 입력해도 에러 없이 0원", () => {
@@ -177,16 +180,14 @@ describe("calculateQuote", () => {
     expect(result.totalPrice).toBe(0);
   });
 
-  test("콘텐츠 유형 선택 시 기획 및 리서치 항목이 항상 포함됨", () => {
+  test("콘텐츠 유형을 선택해도 기획 및 리서치 항목은 더 이상 자동 포함되지 않음", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["image"],
       imageDetails: { hasSource: false, imageCount: 1, tasks: [] },
     };
     const result = calculateQuote(input);
-    const planning = result.lineItems.find((i) => i.name === "기획 및 리서치");
-    expect(planning).toBeDefined();
-    expect(planning!.totalCost).toBe(188040);
+    expect(result.lineItems.find((i) => i.name === "기획 및 리서치")).toBeUndefined();
   });
 
   test("AI 콘텐츠를 선택하지 않으면 프롬프트 설계 항목은 없음", () => {
@@ -199,7 +200,7 @@ describe("calculateQuote", () => {
     expect(result.lineItems.find((i) => i.name === "프롬프트 설계")).toBeUndefined();
   });
 
-  test("AI 콘텐츠를 선택하면 프롬프트 설계 항목이 추가됨", () => {
+  test("AI 콘텐츠를 선택하면 프롬프트 설계 항목이 여전히 자동으로 추가됨", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["ai-image"],

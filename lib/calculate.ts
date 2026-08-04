@@ -1,9 +1,9 @@
 import type { QuoteInput, QuoteResult, LineItem, CategorySummary } from "@/lib/types";
-import { RATES, DAILY_RATE } from "@/lib/rates";
+import { RATES, AI_RATES, type RateItem, type AIRate } from "@/lib/rates";
 
 function item(
   category: LineItem["category"],
-  rate: { name: string; unit: string; cost: number },
+  rate: RateItem,
   quantity: number,
   perPanel: boolean,
   panelCount: number
@@ -16,26 +16,23 @@ function item(
     quantity: effectiveQty,
     unitCost: rate.cost,
     totalCost: rate.cost * effectiveQty,
+    minutes: rate.minutes,
+    difficultyWeight: rate.difficultyWeight,
   };
 }
 
-function aiItem(
-  category: "ai-image" | "ai-video",
-  rate: { name: string; unit: string; cost: number; usageFee?: number },
-  quantity: number
-): { line: LineItem; fixedPortion: number } {
-  const fee = rate.usageFee ?? 0;
-  const totalCost = (rate.cost + fee) * quantity;
+function aiItem(category: "ai-image" | "ai-video", rate: AIRate, quantity: number): LineItem {
+  const usageFee = rate.attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
+  const unitCost = rate.laborCost + usageFee;
   return {
-    line: {
-      category,
-      name: rate.name,
-      unit: rate.unit,
-      quantity,
-      unitCost: rate.cost + fee,
-      totalCost,
-    },
-    fixedPortion: fee * quantity,
+    category,
+    name: rate.name,
+    unit: rate.unit,
+    quantity,
+    unitCost,
+    totalCost: unitCost * quantity,
+    laborCost: rate.laborCost,
+    attemptGroups: rate.attemptGroups,
   };
 }
 
@@ -66,18 +63,11 @@ function buildSummary(items: LineItem[]): CategorySummary[] {
 
 export function calculateQuote(input: QuoteInput): QuoteResult {
   const items: LineItem[] = [];
-  const fixedPortions: number[] = [];
-  const push = (line: LineItem, fixedPortion = 0) => {
-    items.push(line);
-    fixedPortions.push(fixedPortion);
-  };
+  const push = (line: LineItem) => { items.push(line); };
 
   const p = input.panelInfo.count;
   const durationMin = Math.max(1, Math.ceil((input.videoDetails?.durationSeconds ?? 0) / 60));
 
-  if (input.contentTypes.length > 0) {
-    push(item("planning", RATES.planning.research, 1, false, 1));
-  }
   if (input.contentTypes.includes("ai-image") || input.contentTypes.includes("ai-video")) {
     push(item("planning", RATES.planning.promptDesign, 1, false, 1));
   }
@@ -150,33 +140,14 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
   }
 
   if (input.contentTypes.includes("ai-image") && input.aiImageDetails.count > 0) {
-    const { line, fixedPortion } = aiItem("ai-image", RATES.ai.image, input.aiImageDetails.count);
-    push(line, fixedPortion);
+    push(aiItem("ai-image", AI_RATES.image, input.aiImageDetails.count));
   }
 
   if (input.contentTypes.includes("ai-video") && input.aiVideoDetails.count > 0) {
-    const { line, fixedPortion } = aiItem("ai-video", RATES.ai.video, input.aiVideoDetails.count);
-    push(line, fixedPortion);
+    push(aiItem("ai-video", AI_RATES.video, input.aiVideoDetails.count));
   }
 
-  const keepIdx = items.map((_, i) => i).filter(i => items[i].quantity > 0 && items[i].totalCost > 0);
-  let filteredItems = keepIdx.map(i => items[i]);
-  const filteredFixed = keepIdx.map(i => fixedPortions[i]);
-
-  const schedule = input.expectedScheduleDays;
-  if (schedule && schedule > 0) {
-    const scalableSum = filteredItems.reduce((s, it, i) => s + (it.totalCost - filteredFixed[i]), 0);
-    if (scalableSum > 0) {
-      const targetBudget = schedule * DAILY_RATE;
-      const scaleFactor = targetBudget / scalableSum;
-      filteredItems = filteredItems.map((it, i) => {
-        const fixed = filteredFixed[i];
-        const scalable = it.totalCost - fixed;
-        const totalCost = Math.round(scalable * scaleFactor + fixed);
-        return { ...it, totalCost, unitCost: Math.round(totalCost / it.quantity) };
-      });
-    }
-  }
+  const filteredItems = items.filter(i => i.quantity > 0 && i.totalCost > 0);
 
   return recalcResult(filteredItems, input.marginRate);
 }
