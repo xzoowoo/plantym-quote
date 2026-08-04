@@ -3,9 +3,9 @@ import { getCatalog } from "@/lib/catalog";
 describe("getCatalog", () => {
   test("AI 이미지 항목은 laborCost와 attemptGroups를 포함", () => {
     const aiImage = getCatalog().find(c => c.category === "ai-image");
-    expect(aiImage?.laborCost).toBe(15670);
+    expect(aiImage?.laborCost).toBe(393709);
     expect(aiImage?.attemptGroups?.[0]).toEqual({ label: "이미지 생성 횟수", count: 10, costPerAttempt: 130 });
-    expect(aiImage?.unitCost).toBe(16970);
+    expect(aiImage?.unitCost).toBe(395009);
   });
 
   test("일반 항목(사이즈 변경)은 minutes와 difficultyWeight를 포함", () => {

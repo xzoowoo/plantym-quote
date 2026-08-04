@@ -34,13 +34,15 @@ describe("RATES 기본값 갱신 (2026-08-04 단가표 기준)", () => {
 });
 
 describe("AI_RATES", () => {
-  test("AI 이미지: 작업비 15,670원 + 시도 10건×130원 = 16,970원", () => {
+  test("AI 이미지: 작업비 393,709원(260804 단가표 기준) + 시도 10건×130원 = 395,009원", () => {
+    expect(AI_RATES.image.laborCost).toBe(393709);
     const usageFee = AI_RATES.image.attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
-    expect(AI_RATES.image.laborCost + usageFee).toBe(16970);
+    expect(AI_RATES.image.laborCost + usageFee).toBe(395009);
   });
-  test("AI 영상: 영상 생성 10건×2,170원 = 21,700원 사용료 (참고이미지 생성 비용은 AI 이미지 항목과 중복이라 제외)", () => {
+  test("AI 영상: 작업비 646,388원(260804 단가표 기준) + 영상 생성 10건×2,170원 = 668,088원 (참고이미지 생성 비용은 AI 이미지 항목과 중복이라 제외)", () => {
+    expect(AI_RATES.video.laborCost).toBe(646388);
     const usageFee = AI_RATES.video.attemptGroups.reduce((s, g) => s + g.count * g.costPerAttempt, 0);
     expect(usageFee).toBe(21700);
-    expect(AI_RATES.video.laborCost + usageFee).toBe(4722700);
+    expect(AI_RATES.video.laborCost + usageFee).toBe(668088);
   });
 });

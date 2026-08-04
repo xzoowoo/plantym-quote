@@ -107,7 +107,7 @@ describe("calculateQuote", () => {
     expect(item!.totalCost).toBe(3918 * 3);
   });
 
-  test("AI 이미지 2건 → 16,970 × 2, laborCost/attemptGroups 포함", () => {
+  test("AI 이미지 2건 → 395,009 × 2, laborCost/attemptGroups 포함", () => {
     const input: QuoteInput = {
       ...baseInput,
       contentTypes: ["ai-image"],
@@ -115,8 +115,8 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "AI 이미지 생성");
-    expect(item!.totalCost).toBe(16970 * 2);
-    expect(item!.laborCost).toBe(15670);
+    expect(item!.totalCost).toBe(395009 * 2);
+    expect(item!.laborCost).toBe(393709);
     expect(item!.attemptGroups).toEqual([{ label: "이미지 생성 횟수", count: 10, costPerAttempt: 130 }]);
   });
 
@@ -128,8 +128,9 @@ describe("calculateQuote", () => {
     };
     const result = calculateQuote(input);
     const item = result.lineItems.find((i) => i.name === "AI 영상 생성");
+    expect(item!.laborCost).toBe(646388);
     expect(item!.attemptGroups).toEqual([{ label: "영상 생성 횟수", count: 10, costPerAttempt: 2170 }]);
-    expect(item!.totalCost).toBe(4722700);
+    expect(item!.totalCost).toBe(668088);
   });
 
   test("categorySummary에 이미지·AI 카테고리 집계", () => {
