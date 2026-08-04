@@ -95,7 +95,7 @@ export default function QuoteTable({ result, input, editable, catalog, onUpdateQ
             <th className="px-6 py-4 text-[11px] font-bold text-slate-400">작업 항목</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[80px]">기준</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[70px]">수량</th>
-            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[150px]">소요시간/건수</th>
+            <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-center w-[150px]">소요시간/건수 (건당)</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[130px]">단가</th>
             <th className="px-4 py-4 text-[11px] font-bold text-slate-400 text-right w-[150px] pr-6">합계</th>
             {editable && <th className="w-[48px]" />}

@@ -132,7 +132,7 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
           <Text style={s.hName}>작업 항목</Text>
           <Text style={s.hUnit}>기준</Text>
           <Text style={s.hQty}>수량</Text>
-          <Text style={s.hTime}>소요시간/건수</Text>
+          <Text style={s.hTime}>소요시간/건수 (건당)</Text>
           <Text style={s.hUnitCost}>단가</Text>
           <Text style={s.hTotal}>합계</Text>
         </View>
