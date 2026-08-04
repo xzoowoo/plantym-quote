@@ -19,6 +19,12 @@ const CATEGORY_INFO: Record<LineItem["category"], { label: string; english: stri
 
 const fmt = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n)) + "원";
 
+const timeOrAttempts = (li: LineItem): string => {
+  if (li.minutes !== undefined) return `${li.minutes}분`;
+  if (li.attemptGroups) return li.attemptGroups.map(g => `${g.label} ${g.count}건`).join("\n");
+  return "-";
+};
+
 const s = StyleSheet.create({
   page: { padding: 48, fontFamily: "NotoSansKR", fontSize: 10, color: "#333" },
   badge: {
@@ -41,8 +47,9 @@ const s = StyleSheet.create({
   hName:     { flex: 1,    fontSize: 8, color: "#9ca3af" },
   hUnit:     { width: 50,  fontSize: 8, color: "#9ca3af", textAlign: "center" },
   hQty:      { width: 35,  fontSize: 8, color: "#9ca3af", textAlign: "center" },
-  hUnitCost: { width: 85,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
-  hTotal:    { width: 85,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
+  hTime:     { width: 90,  fontSize: 8, color: "#9ca3af", textAlign: "center" },
+  hUnitCost: { width: 80,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
+  hTotal:    { width: 80,  fontSize: 8, color: "#9ca3af", textAlign: "right" },
   // 카테고리 그룹 헤더
   catRow: { paddingTop: 14, paddingHorizontal: 6, paddingBottom: 0 },
   catLabel: { fontSize: 11, color: "#374151" },
@@ -57,8 +64,9 @@ const s = StyleSheet.create({
   cName:     { flex: 1,   fontSize: 9, color: "#1f2937" },
   cUnit:     { width: 50, fontSize: 9, color: "#9ca3af", textAlign: "center" },
   cQty:      { width: 35, fontSize: 9, color: "#1f2937", fontWeight: "bold", textAlign: "center" },
-  cUnitCost: { width: 85, fontSize: 9, color: "#9ca3af", textAlign: "right" },
-  cTotal:    { width: 85, fontSize: 9, color: "#111827", fontWeight: "bold", textAlign: "right" },
+  cTime:     { width: 90, fontSize: 8, color: "#1f2937", textAlign: "center" },
+  cUnitCost: { width: 80, fontSize: 9, color: "#9ca3af", textAlign: "right" },
+  cTotal:    { width: 80, fontSize: 9, color: "#111827", fontWeight: "bold", textAlign: "right" },
   // 푸터
   footerRow: {
     flexDirection: "row", paddingVertical: 6, paddingHorizontal: 6,
@@ -124,6 +132,7 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
           <Text style={s.hName}>작업 항목</Text>
           <Text style={s.hUnit}>기준</Text>
           <Text style={s.hQty}>수량</Text>
+          <Text style={s.hTime}>소요시간/건수</Text>
           <Text style={s.hUnitCost}>단가</Text>
           <Text style={s.hTotal}>합계</Text>
         </View>
@@ -147,6 +156,7 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
                   <Text style={s.cName}>{lineItem.name}</Text>
                   <Text style={s.cUnit}>{lineItem.unit}</Text>
                   <Text style={s.cQty}>{lineItem.quantity}</Text>
+                  <Text style={s.cTime}>{timeOrAttempts(lineItem)}</Text>
                   <Text style={s.cUnitCost}>{fmt(lineItem.unitCost)}</Text>
                   <Text style={s.cTotal}>{fmt(lineItem.totalCost)}</Text>
                 </View>
@@ -174,7 +184,7 @@ export function PDFDocumentInternal({ input, result }: { input: QuoteInput; resu
         <Text style={s.note}>
           산출 근거: 기준 단가 188,040원/일(8시간 기준), 23,505원/시간 · 난이도 가중치 하 1.0 / 중 1.5 / 상 2.0 · 근거: 한국디자인산업연합회(KODIA) 2025년 산업별 노임단가표
           {"\n"}AI 생성비 산출 근거: 작업비(기획·리서치, 프롬프트 설계, 생성·선별, 후보정·합성)는 위와 동일한 기준 단가·난이도로 산정 · AI 솔루션 사용료는 Midjourney Mega Plan · Gemini Ultra Plan 기준, 이미지 생성 130원/건 · 영상 생성 2,170원/건(환율 1,550원/USD, 2026-07-01 기준)
-          {input.expectedScheduleDays ? `\n본 견적은 예상 제작일정 ${input.expectedScheduleDays}일 기준으로 항목별 금액이 비율에 맞춰 재조정되었습니다.` : ""}
+          {input.expectedScheduleDays ? `\n예상 제작일정 ${input.expectedScheduleDays}일은 참고용으로 기재된 값이며, 항목별 금액에는 반영되지 않았습니다.` : ""}
         </Text>
         <Text style={s.note}>본 문서는 내부 원가 정보를 포함하고 있어 외부 공개를 금합니다. 플랜티엠</Text>
       </Page>
