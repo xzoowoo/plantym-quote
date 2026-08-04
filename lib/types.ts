@@ -73,6 +73,12 @@ export interface QuoteInput {
   expectedScheduleDays?: number;
 }
 
+export interface AttemptGroup {
+  label: string;
+  count: number;
+  costPerAttempt: number;
+}
+
 export interface LineItem {
   category: "planning" | "image" | "video" | "motion" | "render" | "ai-image" | "ai-video";
   name: string;
@@ -80,6 +86,10 @@ export interface LineItem {
   quantity: number;
   unitCost: number;
   totalCost: number;
+  minutes?: number;
+  difficultyWeight?: number;
+  laborCost?: number;
+  attemptGroups?: AttemptGroup[];
 }
 
 export interface CategorySummary {
